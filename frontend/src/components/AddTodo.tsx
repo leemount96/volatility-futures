@@ -1,4 +1,5 @@
 import React from 'react';
+import "./AddTodo.css";
 
 export const AddTodoComponent = ({addTodos}: {addTodos: (text: string) => void}) => {
     const [todo, setTodo] = React.useState<string>("");

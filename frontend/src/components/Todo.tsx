@@ -1,4 +1,5 @@
 import React from "react";
+import "./Todo.css";
 
 export type ITodo = {
     id: number;
