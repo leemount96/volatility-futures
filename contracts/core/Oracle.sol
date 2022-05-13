@@ -20,12 +20,6 @@ contract Oracle is Ownable {
         spotEVOLLevel = _newSpotLevel;
     }
 
-    //TODO: Implement getting of settlement price, for now return default of 80%
-    function getSettlementPrice(address _vtokenAddress) public returns (uint256) {
-        uint256 contractSettlementPrice = uint256(0.8*10**8);
-        return contractSettlementPrice;
-    }
-
     //TODO: Implement getting of mark price, for now return default of 85%
     function getIndexMark() public returns (uint256) {
         uint256 contractSettlementPrice = uint256(0.85*10**8);

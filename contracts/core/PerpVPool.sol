@@ -8,18 +8,18 @@ contract PerpVPool{
         return price;
     }
 
-    function buy(uint256 _amount) public returns (uint256){
+    function buy(uint256 _amountUSDC) public returns (uint256){
 
     }
 
-    function sell(uint256 _amount) public returns (uint256){
+    function sell(uint256 _amountUSDc) public returns (uint256){
 
     }
 
-    function buyAmountVPerp(int256 _amount) public returns (uint256) {
+    function buyAmountVPerp(int256 _amountEVIX) public returns (uint256) {
 
     }
-    function sellAmountVPerp(int256 _amount) public returns (uint256) {
+    function sellAmountVPerp(int256 _amountEVIX) public returns (uint256) {
         
     }
 
