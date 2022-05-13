@@ -27,7 +27,7 @@ contract Oracle is Ownable {
     }
 
     //TODO: Implement getting of mark price, for now return default of 85%
-    function getMarkPrice(address _vtokenAddress) public returns (uint256) {
+    function getIndexMark() public returns (uint256) {
         uint256 contractSettlementPrice = uint256(0.85*10**8);
         return contractSettlementPrice;
     }

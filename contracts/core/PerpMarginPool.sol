@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {VPerp} from "../core/VPerp.sol";
 import {Oracle} from "../core/Oracle.sol";
+import {PerpVPool} from "../core/PerpVPool.sol";
 
 
 /*
@@ -15,23 +16,19 @@ The MarginPool contract functions as the central clearinghouse for the protocol
 
 Only accepting USDC as collateral asset for now
 */
-contract PerpMarginPool is Ownable {
+contract PerpMarginPool {
     //Mapping of user address to list of contracts, co balances
-    mapping(address => Position) internal longPositions;
-    mapping(address => Position) internal shortPositions;
+    mapping(address => Position) internal positions;
+
+    mapping(address => uint256) internal freeCollateralMap;
 
     struct Position {
         int256 amountVPerp;
-        uint256 amountCollateral;
-        int256 realizedPnL;
-        uint256 holderNumber;
+        int256 fundingPNL;
+        uint256 tradedPrice;
     }
-    
-    address[] internal longHolders;
-    address[] internal shortHolders;
 
     address public tUSDCAddress;
-    address public vPerpAddress;
 
     //Current initialization margin rates
     uint256 public longMarginInit;
@@ -40,142 +37,96 @@ contract PerpMarginPool is Ownable {
     uint256 public shortMarginMaintenance;
 
     Oracle private oracle;
+    PerpVPool private perpVPool;
 
-    constructor(uint256 _longRate, uint256 _shortRate, address _oracleAddress, address _vperpAddress){
+    constructor(uint256 _longRate, uint256 _shortRate, address _oracleAddress, address _perpVPoolAddress){
         require(_longRate > 0, "Rate must be >0");
         require(_shortRate > 0, "Rate must be >0");
         require(_oracleAddress != address(0), "Invalid oracle");
+        require(_perpVPoolAddress != address(0), "Invalid oracle");
 
         longMarginInit = _longRate;
         longMarginMaintenance = _longRate;
         shortMarginInit = _shortRate;
         shortMarginMaintenance = _shortRate;
+
         oracle = Oracle(_oracleAddress);
+        perpVPool = PerpVPool(_perpVPoolAddress);
 
         tUSDCAddress = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F; //Goerli Testnet Address
-        vPerpAddress = _vperpAddress;
-        VPerp perp = VPerp(vPerpAddress);
-        perp.init(address(this));
+    }
+
+    //deposit collateral from message sender (user)
+    function depositCollateral(uint256 _collateralAmount) public {
+        freeCollateralMap[msg.sender] += _collateralAmount;
+        ERC20Upgradeable(tUSDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
+    }
+
+    //return collateral to user
+    function returnCollateral(uint256 _collateralAmount) public {
+        require(freeCollateralMap[msg.sender] >= _collateralAmount, "Not enough free collateral");
+
+        freeCollateralMap[msg.sender] -= _collateralAmount;
+        ERC20Upgradeable(tUSDCAddress).transferFrom(address(this), msg.sender, _collateralAmount);
     }
 
     //Create a long position for user
-    function createLongPosition(address _user, uint256 _amountVPerp, uint256 _collateralAmount) public onlyOwner{
-        require(_collateralAmount >= longMarginInit * _amountVPerp, "Not enough collateral");
-        
-        _transferToPool(_user, _collateralAmount);
-        
-        VPerp vperp = VPerp(vPerpAddress);
-        vperp.mintVtoken(_user, _amountVPerp);
+    // for now, require that they can only have one open position at a time
+    function openLongPosition(uint256 _amountVPerpUSDC) public {
+        require(freeCollateralMap[msg.sender] >= longMarginInit * _amountVPerpUSDC, "Not enough collateral");
+        require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
-        longPositions[_user] = Position(int256(_amountVPerp), _collateralAmount, 0, longHolders.length);
-
-        longHolders.push(_user);
+        freeCollateralMap[msg.sender] -= longMarginInit * _amountVPerpUSDC;
+        uint256 avgPrice = perpVPool.buy(_amountVPerpUSDC);
+        positions[msg.sender] = Position(int256(_amountVPerpUSDC/avgPrice), 0, avgPrice);
     }
     
-    //create short position for user
-    function createShortPosition(address _user, uint256 _amountVPerp, uint256 _collateralAmount) public onlyOwner{
-        require(_collateralAmount >= shortMarginInit * _amountVPerp, "Not enough collateral");
+    //Create short position for user
+    function openShortPosition(uint256 _amountVPerp) public {
+        require(freeCollateralMap[msg.sender] >= shortMarginInit * _amountVPerp, "Not enough collateral");
+        require(positions[msg.sender].amountVPerp == 0, "Already have open position");
+
+        freeCollateralMap[msg.sender] -= shortMarginInit * _amountVPerp;
+        uint256 avgPrice = perpVPool.sell(_amountVPerp);
+        positions[msg.sender] = Position(int256(_amountVPerp) * -1/int256(avgPrice), 0, avgPrice);
+    }
+
+    //Close existing long position for user, for now close whole position
+    function closeLongPosition() public{
+        require(positions[msg.sender].amountVPerp > 0, "Don't have a long position");
+
+        uint256 avgPrice = perpVPool.sellAmountVPerp(positions[msg.sender].amountVPerp);
+        freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(avgPrice-positions[msg.sender].tradedPrice) + positions[msg.sender].fundingPNL);
         
-        _transferToPool(_user, _collateralAmount);
-        //TODO: Short VToken Representation
-        int256 intPerpAmount = int256(_amountVPerp);
-
-        shortPositions[_user] = Position(-1*intPerpAmount, _collateralAmount, 0, shortHolders.length);
-
-        shortHolders.push(_user);
+        positions[msg.sender] = Position(0, 0, 0);
     }
 
-    //For now, redeem full position
-    function redeemPosition(address _user, uint256 _amountVPerp, bool isLong) public onlyOwner {
-        Position storage pos;
+    //Close existing short position for user, for now close whole position
+    function closeShortPosition() public {
+        require(positions[msg.sender].amountVPerp < 0, "Don't have a short position");
 
-        if(isLong){
-            pos = longPositions[_user];
-        } else {
-            pos = shortPositions[_user];
-        }
+        uint256 avgPrice = perpVPool.buyAmountVPerp(positions[msg.sender].amountVPerp);
+        freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(positions[msg.sender].tradedPrice-avgPrice) + positions[msg.sender].fundingPNL);
         
-        require(int256(_amountVPerp) == pos.amountVPerp, "Must redeem less than holdings");
-
-        uint256 transferAmount = uint256(int256(pos.amountCollateral) + pos.realizedPnL);
-
-        _transferToUser(_user, transferAmount);
-
-        pos.amountVPerp = 0;
-        pos.amountCollateral = 0;
-        pos.realizedPnL = 0;
-
-        if(isLong){
-            delete longHolders[pos.holderNumber];
-        } else {
-            delete shortHolders[pos.holderNumber];
-        }
+        positions[msg.sender] = Position(0, 0, 0);
     }
 
-    function _transferToPool(address _user, uint256 _amount) public onlyOwner{
-        ERC20Upgradeable(tUSDCAddress).transferFrom(_user, address(this), _amount);
-    }
-
-    function _transferToUser(address _user, uint256 _amount) public onlyOwner{
-        ERC20Upgradeable(tUSDCAddress).transferFrom(address(this), _user, _amount);
-    }
-
-    function setLongMarginRate(uint256 _newLongRate) internal onlyOwner{
+    function setLongMarginRate(uint256 _newLongRate) internal {
         longMarginInit = _newLongRate;
         longMarginMaintenance = _newLongRate;
     }
 
-    function setShortMarginRate(uint256 _newShortRate) internal onlyOwner{
+    function setShortMarginRate(uint256 _newShortRate) internal {
         shortMarginInit = _newShortRate;
         shortMarginMaintenance = _newShortRate;
     }
 
-    function periodSettlement() internal onlyOwner{
-        uint256 markPrice = _getMarkPrice();
-        uint256 periodSettlementPrice = _getTodaySettlement();
+    function settleFunding(address _user) internal {
+        require(positions[_user].amountVPerp != 0, "No open positions");
 
-        int256 settlementAmount = int256(periodSettlementPrice) - int256(markPrice);
+        uint256 poolMark = perpVPool.getMark();
+        uint256 indexMark = oracle.getIndexMark();
 
-        for(uint256 i = 0; i < longHolders.length; i++){
-            Position storage pos = longPositions[longHolders[i]];
-
-            if(pos.amountVPerp == 0){
-                continue;
-            }
-
-            pos.realizedPnL += pos.amountVPerp * settlementAmount; 
-            if(int(pos.amountCollateral) + pos.realizedPnL < int(longMarginMaintenance) * pos.amountVPerp){
-                _sendLiquidationWarning(longHolders[i], true);
-            }
-        }
-
-        for(uint256 i = 0; i < shortHolders.length; i++){
-            Position storage pos = shortPositions[shortHolders[i]];
-            
-            if(pos.amountVPerp == 0){
-                continue;
-            }
-
-            pos.realizedPnL += pos.amountVPerp * settlementAmount; 
-            if(int(pos.amountCollateral) + pos.realizedPnL < int(longMarginMaintenance) * pos.amountVPerp){
-                _sendLiquidationWarning(shortHolders[i], false);
-            }
-        }
-    }
-    
-    function _getTodaySettlement() internal onlyOwner returns(uint256){
-        uint256 vPerpSettlementLevel = oracle.getSettlementPrice(vPerpAddress);
-
-        return vPerpSettlementLevel;
-    }
-
-    function _getMarkPrice() internal onlyOwner returns(uint256){
-        uint256 vPerpMark = oracle.getMarkPrice(vPerpAddress);
-
-        return vPerpMark;
-    }
-
-    function _sendLiquidationWarning(address holder, bool isLong) internal onlyOwner {
-
+        positions[_user].fundingPNL += int256(indexMark - poolMark) * positions[_user].amountVPerp;
     }
 }
