@@ -140,4 +140,82 @@ describe("VPerp", function () {
         expect(parsedEvent.amount).to.equal(20);
     })
   });
+
+  describe("Selling VPerp into pool by withdrawing USDC", function (){
+    beforeEach(async function (){ 
+        await deployedPool.provideLiquidity(addr1.address, 1000);
+    })
+
+    it("Sell into pool for addr2 with normal inputs", async function (){
+        await deployedPool.connect(addr2).sell(500);
+
+        var tradedEvent = await deployedPool.queryFilter("TradedVPerp");
+        var parsedEvent = tradedEvent[0].args;
+
+        expect(await deployedPool.poolUSDC()).to.equal(500);
+        expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(500);
+        expect(await deployedUSDC.balanceOf(addr2.address)).to.equal(addr2USDC + 500);
+
+        expect(await deployedPool.poolVPerp()).to.equal(200);
+        expect(await deployedPool.price()).to.equal(2);
+        expect(parsedEvent.price).to.equal(5);
+        expect(parsedEvent.amount).to.equal(100);
+    })
+
+    it("Sell into pool from addr2 then again from addr3", async function (){
+        await deployedPool.connect(addr2).sell(500);
+        await deployedPool.connect(addr3).sell(100);
+
+        var tradedEvent = await deployedPool.queryFilter("TradedVPerp");
+        var parsedEvent = tradedEvent[tradedEvent.length - 1].args;
+
+        expect(await deployedPool.poolUSDC()).to.equal(400);
+        expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(400);
+        expect(await deployedUSDC.balanceOf(addr3.address)).to.equal(addr3USDC + 100);
+
+        expect(await deployedPool.poolVPerp()).to.equal(250); //should be 50, need to figure out rounding
+        expect(await deployedPool.price()).to.equal(1);
+        expect(parsedEvent.price).to.equal(2);
+        expect(parsedEvent.amount).to.equal(50);
+    })
+  });
+
+  describe("Selling VPerp into pool by selling specific amount", function (){
+    beforeEach(async function (){ 
+        await deployedPool.provideLiquidity(addr1.address, 1000);
+    })
+
+    it("Sell into pool for addr2 with normal inputs", async function (){
+        await deployedPool.connect(addr2).sellAmountVPerp(50);
+
+        var tradedEvent = await deployedPool.queryFilter("TradedVPerp");
+        var parsedEvent = tradedEvent[0].args;
+
+        expect(await deployedPool.poolUSDC()).to.equal(666);
+        expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(666);
+        expect(await deployedUSDC.balanceOf(addr2.address)).to.equal(addr2USDC + 334);
+
+        expect(await deployedPool.poolVPerp()).to.equal(150);
+        expect(await deployedPool.price()).to.equal(4);
+        expect(parsedEvent.price).to.equal(6);
+        expect(parsedEvent.amount).to.equal(50);
+    })
+
+    it("Sell into pool from addr2 then again from addr3", async function (){
+        await deployedPool.connect(addr2).sellAmountVPerp(50);
+        await deployedPool.connect(addr3).sellAmountVPerp(75);
+
+        var tradedEvent = await deployedPool.queryFilter("TradedVPerp");
+        var parsedEvent = tradedEvent[tradedEvent.length - 1].args;
+
+        expect(await deployedPool.poolUSDC()).to.equal(444);
+        expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(444);
+        expect(await deployedUSDC.balanceOf(addr3.address)).to.equal(addr3USDC + 222);
+
+        expect(await deployedPool.poolVPerp()).to.equal(225); //should be 50, need to figure out rounding
+        expect(await deployedPool.price()).to.equal(1);
+        expect(parsedEvent.price).to.equal(2);
+        expect(parsedEvent.amount).to.equal(75);
+    })
+  });
 });

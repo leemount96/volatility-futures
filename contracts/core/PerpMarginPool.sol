@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.13;
 
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {VPerp} from "../core/VPerp.sol";
 import {Oracle} from "../core/Oracle.sol";
 import {PerpVPool} from "../core/PerpVPool.sol";
@@ -63,7 +63,7 @@ contract PerpMarginPool {
     //deposit collateral from message sender (user)
     function depositCollateral(uint256 _collateralAmount) public {
         freeCollateralMap[msg.sender] += _collateralAmount;
-        ERC20Upgradeable(tUSDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
+        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
     }
 
     //return collateral to user
@@ -71,7 +71,7 @@ contract PerpMarginPool {
         require(freeCollateralMap[msg.sender] >= _collateralAmount, "Not enough free collateral");
 
         freeCollateralMap[msg.sender] -= _collateralAmount;
-        ERC20Upgradeable(tUSDCAddress).transferFrom(address(this), msg.sender, _collateralAmount);
+        ERC20(tUSDCAddress).transferFrom(address(this), msg.sender, _collateralAmount);
     }
 
     //Create a long position for user
@@ -101,7 +101,7 @@ contract PerpMarginPool {
     function closeLongPosition() public{
         require(positions[msg.sender].amountVPerp > 0, "Don't have a long position");
 
-        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(positions[msg.sender].amountVPerp);
+        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(uint256(positions[msg.sender].amountVPerp));
         freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(avgPrice-positions[msg.sender].tradedPrice) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount));
         
         positions[msg.sender] = Position(0, 0, 0, 0);
