@@ -2,7 +2,6 @@
 pragma solidity 0.8.13;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {VPerp} from "../core/VPerp.sol";
 import {Oracle} from "../core/Oracle.sol";
 import {PerpVPool} from "../core/PerpVPool.sol";
 

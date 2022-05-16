@@ -41,7 +41,7 @@ contract PerpVPool{
     }
 
     function removeLiquidity(address _user) public returns (uint256) {
-
+        //TODO
     }
 
     function buy(uint256 _amountUSDC) public returns (uint256, uint256){
