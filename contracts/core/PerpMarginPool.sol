@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Oracle} from "../core/Oracle.sol";
 import {PerpVPool} from "../core/PerpVPool.sol";
+import "hardhat/console.sol";
 
 
 /*
@@ -56,7 +57,7 @@ contract PerpMarginPool {
         oracle = Oracle(_oracleAddress);
         perpVPool = PerpVPool(_perpVPoolAddress);
 
-        USDCAddress = _USDCAddress; //Goerli Testnet Address
+        USDCAddress = _USDCAddress;
     }
 
     //deposit collateral from message sender (user)
@@ -80,6 +81,8 @@ contract PerpMarginPool {
         require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
         freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
+        ERC20(USDCAddress).approve(address(perpVPool), _amountVPerpUSDC);
+
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.buy(_amountVPerpUSDC);
         positions[msg.sender] = Position(int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC);
         liquidationRisk[msg.sender] = false;
@@ -92,7 +95,7 @@ contract PerpMarginPool {
 
         freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sell(_amountVPerpUSDC);
-        positions[msg.sender] = Position(int256(_amountVPerpUSDC) * -1/int256(avgPrice), 0, avgPrice, marginInit * _amountVPerpUSDC);
+        positions[msg.sender] = Position(-1*int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC);
         liquidationRisk[msg.sender] = false;
     }
 
@@ -101,7 +104,8 @@ contract PerpMarginPool {
         require(positions[msg.sender].amountVPerp > 0, "Don't have a long position");
 
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(uint256(positions[msg.sender].amountVPerp));
-        freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(avgPrice-positions[msg.sender].tradedPrice) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount));
+
+        freeCollateralMap[msg.sender] += uint256(int256(amountVPerp * (avgPrice-positions[msg.sender].tradedPrice)) + positions[msg.sender].fundingPNL) + positions[msg.sender].collateralAmount;
         
         positions[msg.sender] = Position(0, 0, 0, 0);
         liquidationRisk[msg.sender] = false;
@@ -121,6 +125,9 @@ contract PerpMarginPool {
     //Provide liquidity in the USDC/EVIX "Virtual" Pool
     function provideLiquidity(uint256 _amountVPerpUSDC) public {
         freeCollateralMap[msg.sender] -= _amountVPerpUSDC;
+
+        ERC20(USDCAddress).approve(address(perpVPool), _amountVPerpUSDC);
+
         perpVPool.provideLiquidity(msg.sender, _amountVPerpUSDC);
     }
 
@@ -129,18 +136,18 @@ contract PerpMarginPool {
         freeCollateralMap[msg.sender] += returnedUSDC;
     }
 
-    function _settleFunding(address _user) internal {
+    function _settleFunding(address _user) public {
         require(positions[_user].amountVPerp != 0, "No open positions");
 
         uint256 poolMark = perpVPool.price();
         uint256 indexMark = oracle.spotEVIXLevel();
 
-        positions[_user].fundingPNL += int256(indexMark - poolMark) * positions[_user].amountVPerp;
+        positions[_user].fundingPNL += (int256(indexMark) - int256(poolMark)) * positions[_user].amountVPerp;
 
         _checkCollateralLevel(_user);
     }
 
-    function _checkCollateralLevel(address _user) internal {
+    function _checkCollateralLevel(address _user) public {
         Position memory pos = positions[_user];
         int256 netCollateral = pos.fundingPNL + int256(pos.collateralAmount);
         

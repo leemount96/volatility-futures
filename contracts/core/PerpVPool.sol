@@ -2,6 +2,7 @@
 pragma solidity 0.8.13;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "hardhat/console.sol";
 
 contract PerpVPool{
     uint256 public price;
@@ -31,9 +32,9 @@ contract PerpVPool{
     function provideLiquidity(address _user, uint256 _amountUSDC) public {
         require(positions[_user].amountUSDC == 0 && positions[_user].amountVPerp == 0, "User has position already");
         require(ERC20(tUSDCAddress).balanceOf(_user) >= _amountUSDC, "Not enough USDC in wallet");
-
+        
         ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
-
+        
         poolUSDC += _amountUSDC;
         poolVPerp += _amountUSDC/price;
 
@@ -52,11 +53,11 @@ contract PerpVPool{
         uint256 newPerpAmount = k/(poolUSDC + _amountUSDC);
         uint256 perpTraded = poolVPerp - newPerpAmount;
 
-        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
-
         poolUSDC += _amountUSDC;
         poolVPerp -= perpTraded;
         price = poolUSDC/poolVPerp;
+
+        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
 
         emit TradedVPerp(_amountUSDC/perpTraded, int256(perpTraded));
 
@@ -71,11 +72,11 @@ contract PerpVPool{
         uint256 newPerpAmount = k/(poolUSDC - _amountUSDC);
         uint256 perpTraded = newPerpAmount - poolVPerp;
 
-        ERC20(tUSDCAddress).transfer(msg.sender, _amountUSDC);
-
         poolUSDC -= _amountUSDC;
         poolVPerp += perpTraded;
         price = poolUSDC/poolVPerp;
+
+        ERC20(tUSDCAddress).transfer(msg.sender, _amountUSDC);
 
         emit TradedVPerp(_amountUSDC/perpTraded, int256(perpTraded));
 
@@ -110,14 +111,16 @@ contract PerpVPool{
         uint256 newPerpAmount = poolVPerp + _amountVPerp;
         uint256 newUSDCAmount = k / newPerpAmount;
 
-        ERC20(tUSDCAddress).transfer(msg.sender, poolUSDC - newUSDCAmount);
-        
+        uint256 transferAmount = poolUSDC - newUSDCAmount;
+
         uint256 tradedPrice = (poolUSDC - newUSDCAmount)/_amountVPerp;
 
         poolUSDC = newUSDCAmount;
         poolVPerp = newPerpAmount;
         price = poolUSDC/poolVPerp;
 
+        ERC20(tUSDCAddress).transfer(msg.sender, transferAmount);
+        
         emit TradedVPerp(tradedPrice, int256(_amountVPerp));
 
         return (tradedPrice, _amountVPerp);

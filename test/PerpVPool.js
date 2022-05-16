@@ -173,7 +173,7 @@ describe("VPerp", function () {
         expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(400);
         expect(await deployedUSDC.balanceOf(addr3.address)).to.equal(addr3USDC + 100);
 
-        expect(await deployedPool.poolVPerp()).to.equal(250); //should be 50, need to figure out rounding
+        expect(await deployedPool.poolVPerp()).to.equal(250);
         expect(await deployedPool.price()).to.equal(1);
         expect(parsedEvent.price).to.equal(2);
         expect(parsedEvent.amount).to.equal(50);
@@ -212,10 +212,41 @@ describe("VPerp", function () {
         expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(444);
         expect(await deployedUSDC.balanceOf(addr3.address)).to.equal(addr3USDC + 222);
 
-        expect(await deployedPool.poolVPerp()).to.equal(225); //should be 50, need to figure out rounding
+        expect(await deployedPool.poolVPerp()).to.equal(225);
         expect(await deployedPool.price()).to.equal(1);
         expect(parsedEvent.price).to.equal(2);
         expect(parsedEvent.amount).to.equal(75);
     })
   });
+
+  describe("Opposite direction trades", function (){
+    beforeEach(async function (){ 
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
+    })
+
+    it("Buy from pool for addr2, sell from addr2", async function (){
+        await deployedPool.connect(addr2).buy(500);
+        await deployedPool.connect(addr2).sell(500);
+
+        var tradedEvent = await deployedPool.queryFilter("TradedVPerp");
+        var parsedEvent = tradedEvent[tradedEvent.length - 1].args;
+
+        expect(await deployedPool.poolUSDC()).to.equal(1000);
+        expect(await deployedUSDC.balanceOf(deployedPool.address)).to.equal(1000);
+        expect(await deployedUSDC.balanceOf(addr2.address)).to.equal(addr2USDC);
+
+        expect(await deployedPool.poolVPerp()).to.equal(99); //rounding issue, should be 100
+        expect(await deployedPool.price()).to.equal(10);
+
+        expect(parsedEvent.price).to.equal(15);
+        expect(parsedEvent.amount).to.equal(33);
+    })
+  });
+
+  describe("Positions - provide and remove liquidity", async function () {
+    beforeEach(async function () {
+
+    })
+
+  })
 });
