@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import {VPerp} from "../core/VPerp.sol";
 import {Oracle} from "../core/Oracle.sol";
@@ -22,7 +21,7 @@ contract PerpMarginPool {
 
     mapping(address => uint256) internal freeCollateralMap;
 
-    mapping(address => uint8) internal liquidationRisk; //0=No risk, 1=Low risk, 2=High risk, 3=To be liquidated
+    mapping(address => bool) internal liquidationRisk; //false=No risk, true=Low risk,
 
     struct Position {
         int256 amountVPerp;
@@ -34,15 +33,10 @@ contract PerpMarginPool {
     address public tUSDCAddress;
 
     //Current initialization margin rates
-    uint256 public longMarginInit;
-    uint256 public longMarginLowRiskLevel;
-    uint256 public longMarginHighRiskLevel;
-    uint256 public longMarginLiquidationLevel;
-
-    uint256 public shortMarginInit;
-    uint256 public shortMarginLowRiskLevel;
-    uint256 public shortMarginHighRiskLevel;
-    uint256 public shortMarginLiquidationLevel;
+    uint256 public marginInit;
+    uint256 public marginLowRiskLevel;
+    uint256 public marginHighRiskLevel;
+    uint256 public marginLiquidationLevel;
 
     Oracle private oracle;
     PerpVPool private perpVPool;
@@ -55,14 +49,10 @@ contract PerpMarginPool {
         require(_oracleAddress != address(0), "Invalid oracle");
         require(_perpVPoolAddress != address(0), "Invalid oracle");
 
-        longMarginInit = _initMarginLevel;
-        longMarginLowRiskLevel = _lowRiskMargin;
-        longMarginHighRiskLevel = _highRiskMargin;
-        longMarginLiquidationLevel = _liquidationLevel;
-        shortMarginInit = _initMarginLevel;
-        shortMarginLowRiskLevel = _lowRiskMargin;
-        shortMarginHighRiskLevel = _highRiskMargin;
-        shortMarginLiquidationLevel = _liquidationLevel;
+        marginInit = _initMarginLevel;
+        marginLowRiskLevel = _lowRiskMargin;
+        marginHighRiskLevel = _highRiskMargin;
+        marginLiquidationLevel = _liquidationLevel;
 
         oracle = Oracle(_oracleAddress);
         perpVPool = PerpVPool(_perpVPoolAddress);
@@ -87,57 +77,63 @@ contract PerpMarginPool {
     //Create a long position for user
     // for now, require that they can only have one open position at a time
     function openLongPosition(uint256 _amountVPerpUSDC) public {
-        require(freeCollateralMap[msg.sender] >= longMarginInit * _amountVPerpUSDC, "Not enough collateral");
+        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC, "Not enough collateral");
         require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
-        freeCollateralMap[msg.sender] -= longMarginInit * _amountVPerpUSDC;
-        uint256 avgPrice = perpVPool.buy(_amountVPerpUSDC);
-        positions[msg.sender] = Position(int256(_amountVPerpUSDC/avgPrice), 0, avgPrice, longMarginInit * _amountVPerpUSDC);
-        liquidationRisk[msg.sender] = 0;
+        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
+        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.buy(_amountVPerpUSDC);
+        positions[msg.sender] = Position(int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC);
+        liquidationRisk[msg.sender] = false;
     }
     
     //Create short position for user
     function openShortPosition(uint256 _amountVPerpUSDC) public {
-        require(freeCollateralMap[msg.sender] >= shortMarginInit * _amountVPerpUSDC, "Not enough collateral");
+        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC, "Not enough collateral");
         require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
-        freeCollateralMap[msg.sender] -= shortMarginInit * _amountVPerpUSDC;
-        uint256 avgPrice = perpVPool.sell(_amountVPerpUSDC);
-        positions[msg.sender] = Position(int256(_amountVPerpUSDC) * -1/int256(avgPrice), 0, avgPrice, shortMarginInit * _amountVPerpUSDC);
-        liquidationRisk[msg.sender] = 0;
+        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
+        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sell(_amountVPerpUSDC);
+        positions[msg.sender] = Position(int256(_amountVPerpUSDC) * -1/int256(avgPrice), 0, avgPrice, marginInit * _amountVPerpUSDC);
+        liquidationRisk[msg.sender] = false;
     }
 
     //Close existing long position for user, for now close whole position
     function closeLongPosition() public{
         require(positions[msg.sender].amountVPerp > 0, "Don't have a long position");
 
-        uint256 avgPrice = perpVPool.sellAmountVPerp(positions[msg.sender].amountVPerp);
+        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(positions[msg.sender].amountVPerp);
         freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(avgPrice-positions[msg.sender].tradedPrice) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount));
         
         positions[msg.sender] = Position(0, 0, 0, 0);
-        liquidationRisk[msg.sender] = 0;
+        liquidationRisk[msg.sender] = false;
     }
 
     //Close existing short position for user, for now close whole position
     function closeShortPosition() public {
         require(positions[msg.sender].amountVPerp < 0, "Don't have a short position");
 
-        uint256 avgPrice = perpVPool.buyAmountVPerp(positions[msg.sender].amountVPerp);
+        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.buyAmountVPerp(uint256(positions[msg.sender].amountVPerp));
         freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(positions[msg.sender].tradedPrice-avgPrice) + positions[msg.sender].fundingPNL+ int256(positions[msg.sender].collateralAmount));
         
         positions[msg.sender] = Position(0, 0, 0, 0);
-        liquidationRisk[msg.sender] = 0;
+        liquidationRisk[msg.sender] = false;
     }
     
-    //Provide liquidity in the USDC/EVIX "Virtual" Uni V3 Pool
-    function provideLiquidity(uint256 _lowPrice, uint256 _highPrice, uint256 _amountVPerpUSDC) public {
-        
+    //Provide liquidity in the USDC/EVIX "Virtual" Pool
+    function provideLiquidity(uint256 _amountVPerpUSDC) public {
+        freeCollateralMap[msg.sender] -= _amountVPerpUSDC;
+        perpVPool.provideLiquidity(msg.sender, _amountVPerpUSDC);
+    }
+
+    function removeLiquidity() public {
+        uint256 returnedUSDC = perpVPool.removeLiquidity(msg.sender);
+        freeCollateralMap[msg.sender] += returnedUSDC;
     }
 
     function _settleFunding(address _user) internal {
         require(positions[_user].amountVPerp != 0, "No open positions");
 
-        uint256 poolMark = perpVPool.getMark();
+        uint256 poolMark = perpVPool.price();
         uint256 indexMark = oracle.getIndexMark();
 
         positions[_user].fundingPNL += int256(indexMark - poolMark) * positions[_user].amountVPerp;
@@ -147,6 +143,22 @@ contract PerpMarginPool {
 
     function _checkCollateralLevel(address _user) internal {
         Position memory pos = positions[_user];
-        uint256 currentCollateral = pos.collateralAmount;
+        int256 netCollateral = pos.fundingPNL + int256(pos.collateralAmount);
+        
+        if(netCollateral <= int256(int256(marginLiquidationLevel) * abs(pos.amountVPerp) * int256(perpVPool.price()))){
+            _liquidateUserPosition(_user);
+        } else if(netCollateral <= int256(int256(marginHighRiskLevel) * abs(pos.amountVPerp) * int256(perpVPool.price()))){
+            liquidationRisk[_user] = true;
+        } else {
+            liquidationRisk[_user] = false;
+        }
+    }
+
+    function _liquidateUserPosition(address _user) internal {
+
+    }
+
+    function abs(int256 x) private returns (int256) {
+        return x>=0 ? x : -x;
     }
 }
