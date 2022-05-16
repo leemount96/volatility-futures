@@ -32,7 +32,7 @@ contract PerpVPool{
         require(positions[_user].amountUSDC == 0 && positions[_user].amountVPerp == 0, "User has position already");
         require(ERC20(tUSDCAddress).balanceOf(_user) >= _amountUSDC, "Not enough USDC in wallet");
 
-        ERC20(tUSDCAddress).transferFrom(_user, address(this), _amountUSDC);
+        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
 
         poolUSDC += _amountUSDC;
         poolVPerp += _amountUSDC/price;

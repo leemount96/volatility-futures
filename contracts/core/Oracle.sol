@@ -7,8 +7,8 @@ import "hardhat/console.sol";
 contract Oracle is Ownable {
     uint256 public spotEVIXLevel;
 
-    constructor(uint256 _initialEVOLLevel){
-        spotEVIXLevel = _initialEVOLLevel;
+    constructor(uint256 _initialEVIXLevel){
+        spotEVIXLevel = _initialEVIXLevel;
         console.log("Oracle created with initial level %s", spotEVIXLevel);
     }
 
@@ -18,11 +18,5 @@ contract Oracle is Ownable {
         console.log("Updating index level from %s to %s", spotEVIXLevel, _newSpotLevel);
 
         spotEVIXLevel = _newSpotLevel;
-    }
-
-    //TODO: Implement getting of mark price, for now return default of 85%
-    function getIndexMark() public returns (uint256) {
-        uint256 contractSettlementPrice = uint256(0.85*10**8);
-        return contractSettlementPrice;
     }
 }

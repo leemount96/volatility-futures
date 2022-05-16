@@ -50,14 +50,14 @@ describe("VPerp", function () {
     })
 
     it("Providing liquidity from addr1", async function (){
-        await deployedPool.provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
         expect(await deployedPool.poolUSDC()).to.equal(1000);
         expect(await deployedPool.poolVPerp()).to.equal(100);
     })
 
     it("Provide liquidity from addr2 after addr1", async function (){
-        await deployedPool.provideLiquidity(addr1.address, 1000);
-        await deployedPool.provideLiquidity(addr2.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr2).provideLiquidity(addr2.address, 1000);
         expect(await deployedPool.poolUSDC()).to.equal(2000);
         expect(await deployedPool.poolVPerp()).to.equal(200);
     })
@@ -65,7 +65,7 @@ describe("VPerp", function () {
 
   describe("Buying from pool by depositing USDC", function (){
     beforeEach(async function (){ 
-        await deployedPool.provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
     })
 
     it("Buy from pool for addr2 with normal inputs", async function (){
@@ -104,7 +104,7 @@ describe("VPerp", function () {
 
   describe("Buying from pool amount of VPerp", function (){
     beforeEach(async function (){ 
-        await deployedPool.provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
     })
 
     it("Buy from pool for addr2 with normal inputs", async function (){
@@ -143,7 +143,7 @@ describe("VPerp", function () {
 
   describe("Selling VPerp into pool by withdrawing USDC", function (){
     beforeEach(async function (){ 
-        await deployedPool.provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
     })
 
     it("Sell into pool for addr2 with normal inputs", async function (){
@@ -182,7 +182,7 @@ describe("VPerp", function () {
 
   describe("Selling VPerp into pool by selling specific amount", function (){
     beforeEach(async function (){ 
-        await deployedPool.provideLiquidity(addr1.address, 1000);
+        await deployedPool.connect(addr1).provideLiquidity(addr1.address, 1000);
     })
 
     it("Sell into pool for addr2 with normal inputs", async function (){

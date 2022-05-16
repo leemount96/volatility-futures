@@ -16,11 +16,11 @@ Only accepting USDC as collateral asset for now
 */
 contract PerpMarginPool {
     //Mapping of user address to list of contracts, co balances
-    mapping(address => Position) internal positions;
+    mapping(address => Position) public positions;
 
-    mapping(address => uint256) internal freeCollateralMap;
+    mapping(address => uint256) public freeCollateralMap;
 
-    mapping(address => bool) internal liquidationRisk; //false=No risk, true=Low risk,
+    mapping(address => bool) public liquidationRisk; //false=No risk, true=Low risk,
 
     struct Position {
         int256 amountVPerp;
@@ -29,7 +29,7 @@ contract PerpMarginPool {
         uint256 collateralAmount;
     }
 
-    address public tUSDCAddress;
+    address public USDCAddress;
 
     //Current initialization margin rates
     uint256 public marginInit;
@@ -40,7 +40,7 @@ contract PerpMarginPool {
     Oracle private oracle;
     PerpVPool private perpVPool;
 
-    constructor(uint256 _initMarginLevel, uint256 _lowRiskMargin, uint256 _highRiskMargin, uint256 _liquidationLevel, address _oracleAddress, address _perpVPoolAddress){
+    constructor(uint256 _initMarginLevel, uint256 _lowRiskMargin, uint256 _highRiskMargin, uint256 _liquidationLevel, address _oracleAddress, address _perpVPoolAddress, address _USDCAddress){
         require(_initMarginLevel > 0, "Rate must be >0");
         require(_lowRiskMargin > 0, "Rate must be >0");
         require(_highRiskMargin > 0, "Rate must be >0");
@@ -56,13 +56,13 @@ contract PerpMarginPool {
         oracle = Oracle(_oracleAddress);
         perpVPool = PerpVPool(_perpVPoolAddress);
 
-        tUSDCAddress = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F; //Goerli Testnet Address
+        USDCAddress = _USDCAddress; //Goerli Testnet Address
     }
 
     //deposit collateral from message sender (user)
     function depositCollateral(uint256 _collateralAmount) public {
         freeCollateralMap[msg.sender] += _collateralAmount;
-        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
+        ERC20(USDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
     }
 
     //return collateral to user
@@ -70,7 +70,7 @@ contract PerpMarginPool {
         require(freeCollateralMap[msg.sender] >= _collateralAmount, "Not enough free collateral");
 
         freeCollateralMap[msg.sender] -= _collateralAmount;
-        ERC20(tUSDCAddress).transferFrom(address(this), msg.sender, _collateralAmount);
+        ERC20(USDCAddress).transfer(msg.sender, _collateralAmount);
     }
 
     //Create a long position for user
@@ -133,7 +133,7 @@ contract PerpMarginPool {
         require(positions[_user].amountVPerp != 0, "No open positions");
 
         uint256 poolMark = perpVPool.price();
-        uint256 indexMark = oracle.getIndexMark();
+        uint256 indexMark = oracle.spotEVIXLevel();
 
         positions[_user].fundingPNL += int256(indexMark - poolMark) * positions[_user].amountVPerp;
 
