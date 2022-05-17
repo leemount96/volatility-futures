@@ -30,7 +30,7 @@ contract PerpMarginPool {
         uint256 collateralAmount;
     }
 
-    address public USDCAddress;
+    address public USDCAddress; // solhint-disable-line
 
     //Current initialization margin rates
     uint256 public marginInit;
@@ -41,7 +41,7 @@ contract PerpMarginPool {
     Oracle private oracle;
     PerpVPool private perpVPool;
 
-    constructor(uint256 _initMarginLevel, uint256 _lowRiskMargin, uint256 _highRiskMargin, uint256 _liquidationLevel, address _oracleAddress, address _perpVPoolAddress, address _USDCAddress){
+    constructor(uint256 _initMarginLevel, uint256 _lowRiskMargin, uint256 _highRiskMargin, uint256 _liquidationLevel, address _oracleAddress, address _perpVPoolAddress, address _USDCAddress){ // solhint-disable-line
         require(_initMarginLevel > 0, "Rate must be >0");
         require(_lowRiskMargin > 0, "Rate must be >0");
         require(_highRiskMargin > 0, "Rate must be >0");
@@ -62,6 +62,7 @@ contract PerpMarginPool {
 
     //deposit collateral from message sender (user)
     function depositCollateral(uint256 _collateralAmount) public {
+        require(ERC20(USDCAddress).balanceOf(msg.sender) >= _collateralAmount, "not enough USDC");
         freeCollateralMap[msg.sender] += _collateralAmount;
         ERC20(USDCAddress).transferFrom(msg.sender, address(this), _collateralAmount);
     }
@@ -115,7 +116,7 @@ contract PerpMarginPool {
     function closeShortPosition() public {
         require(positions[msg.sender].amountVPerp < 0, "Don't have a short position");
 
-        (uint256 avgPrice, uint256 amountVPerp) = perpVPool.buyAmountVPerp(uint256(positions[msg.sender].amountVPerp));
+        (uint256 avgPrice,) = perpVPool.buyAmountVPerp(uint256(positions[msg.sender].amountVPerp));
         freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(positions[msg.sender].tradedPrice-avgPrice) + positions[msg.sender].fundingPNL+ int256(positions[msg.sender].collateralAmount));
         
         positions[msg.sender] = Position(0, 0, 0, 0);
@@ -160,11 +161,11 @@ contract PerpMarginPool {
         }
     }
 
-    function _liquidateUserPosition(address _user) internal {
-
+    function _liquidateUserPosition(address _user) internal { // solhint-disable-line
+        //TODO
     }
 
-    function abs(int256 x) private returns (int256) {
+    function abs(int256 x) private pure returns (int256) {
         return x>=0 ? x : -x;
     }
 }

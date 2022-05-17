@@ -21,7 +21,7 @@ contract PerpVPool{
         uint256 initPrice;
     }
 
-    constructor(uint256 _initPrice, address USDCAddress){
+    constructor(uint256 _initPrice, address USDCAddress){ // solhint-disable-line
         price = _initPrice;
         poolUSDC = 0;
         poolVPerp = 0;
@@ -41,7 +41,7 @@ contract PerpVPool{
         positions[_user] = LPPosition(_amountUSDC, _amountUSDC/price, price);
     }
 
-    function removeLiquidity(address _user) public returns (uint256) {
+    function removeLiquidity(address _user) public returns (uint256) { // solhint-disable-line
         //TODO
     }
 
