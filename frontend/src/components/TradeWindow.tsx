@@ -19,7 +19,7 @@ const getEVIXIndexMark = async() => {
 
 export const TradeWindowComponent = ({}) => {
     return (
-        <Card style={{ width: '18rem' }} className="float-end">
+        <Card style={{ width: '18rem' }} className="float-end me-5 mt-5">
         <Card.Body>
           <Card.Title>Trade EVIX</Card.Title>
           <Card.Text>

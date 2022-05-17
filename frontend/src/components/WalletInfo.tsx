@@ -54,11 +54,10 @@ export const WalletInfo = ({}) => {
                 {data.Balance} ETH
                 </Card.Text>
 
-                <Button onClick={metamaskHandler} variant="primary" className="float-end">
+                <Button onClick={metamaskHandler} variant="primary">
                 Connect to wallet
                 </Button>
             </Card.Body>
-            
         </Card>
     )
 }

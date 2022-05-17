@@ -1,9 +1,7 @@
 import React from 'react';
 import './App.css';
-import { AddTodoComponent } from './components/AddTodo';
-import { ITodos, TodosComponent } from './components/Todo';
+import { ITodos } from './components/Todo';
 import { TradeWindowComponent } from './components/TradeWindow';
-import { WalletInfo } from './components/WalletInfo';
 import { NavbarComponent } from './components/NavbarComponent'
 
 

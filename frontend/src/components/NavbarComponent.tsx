@@ -20,7 +20,7 @@ export const NavbarComponent = ({}) => {
               <NavDropdown.Item href="#whitepaper">Whitepaper</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="#action/3.4">
-                Separated link
+                Landing Page
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
