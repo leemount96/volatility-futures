@@ -6,9 +6,7 @@ import oracleJson from "../abis/Oracle.json";
 import { Button, Card, ListGroup, ListGroupItem } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// require('dotenv');
-
-const ORACLE_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const ORACLE_ADDRESS = process.env.REACT_APP_ORACLE_ADDRESS!;
 const oracleAbi = oracleJson.abi;
 const oracle = new ethers.Contract(ORACLE_ADDRESS, oracleAbi, ethers.getDefaultProvider("http://localhost:8545"));
 

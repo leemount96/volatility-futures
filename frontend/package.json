@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "dotenv-webpack": "^7.1.0",
     "ethers": "^5.6.6"
   }
 }

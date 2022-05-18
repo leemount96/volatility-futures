@@ -8,6 +8,7 @@ export const WalletInfo = ({}) => {
     const [data, setdata] = useState({
         address: "",
         Balance: "",
+        connected: false,
     })
 
     const metamaskHandler = () => {
@@ -28,6 +29,7 @@ export const WalletInfo = ({}) => {
             setdata({
             address: address,
             Balance: ethers.utils.formatEther(balance),
+            connected: true
             });
         });
     };
@@ -36,28 +38,39 @@ export const WalletInfo = ({}) => {
         setdata({
             address: account,
             Balance: "",
+            connected: true
         });
 
         getBalance(account);
     }
 
+    let content;
+
+    if(data.connected) {
+        content = <Card>
+                <Card.Header className="float-end">
+                    <strong>Address: </strong>
+                    {data.address}
+                </Card.Header>
+
+                <Card.Body>
+                    <Card.Text>
+                        <strong>Balance: </strong>
+                        {data.Balance} ETH
+                    </Card.Text>
+                </Card.Body>
+            </Card>
+    } else {
+        content = <Card>
+                <Button onClick={metamaskHandler} variant="primary">
+                    Connect to wallet
+                </Button>
+            </Card>
+    }
+
     return (
         <Card className = "text-center">
-            <Card.Header className="float-end">
-                <strong>Address: </strong>
-                {data.address}
-            </Card.Header>
-
-            <Card.Body>
-                <Card.Text>
-                <strong>Balance: </strong>
-                {data.Balance} ETH
-                </Card.Text>
-
-                <Button onClick={metamaskHandler} variant="primary">
-                Connect to wallet
-                </Button>
-            </Card.Body>
+            {content}
         </Card>
     )
 }
