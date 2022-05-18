@@ -1,12 +1,14 @@
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import { Routes, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { WalletInfo } from "./WalletInfo";
 
-export const NavbarComponent = ({}) => {
+
+export const NavbarComponent = () => {
   return (
     <Navbar bg="light" expand="lg">
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand as={Link} to="/" href="/">
             <img
             alt=""
             src={require("../assets/EVIXScreenshot.png")}
@@ -19,16 +21,16 @@ export const NavbarComponent = ({}) => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#trade">Trade</Nav.Link>
-            <Nav.Link href="#lp">Provide Liquidity</Nav.Link>
+            <Nav.Link as={Link} to="/trade" href="trade">Trade</Nav.Link>
+            <Nav.Link as={Link} to="/lp" href="lp">Provide Liquidity</Nav.Link>
             <NavDropdown title="FAQ" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#risks">Risks</NavDropdown.Item>
-              <NavDropdown.Item href="#strategies">
+              <NavDropdown.Item as={Link} to="/risks" href="risks">Risks</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/strategies" href="#strategies">
                 Trading Strategies
               </NavDropdown.Item>
-              <NavDropdown.Item href="#whitepaper">Whitepaper</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/whitepaper" href="#whitepaper">Whitepaper</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
+              <NavDropdown.Item as={Link} to="/landing" href="#action/3.4">
                 Landing Page
               </NavDropdown.Item>
             </NavDropdown>

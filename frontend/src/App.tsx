@@ -1,36 +1,36 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter } from "react-router-dom";
 import './App.css';
-import { ITodos } from './components/Todo';
-import { TradeWindowComponent } from './components/TradeWindow';
-import { NavbarComponent } from './components/NavbarComponent'
+import TradeWindowComponent from './components/TradeWindow';
+import { NavbarComponent } from './components/NavbarComponent';
+import { HomeComponent as Home } from "./components/Home";
+import { LPComponent } from "./components/LPComponent";
+import { RisksComponent } from "./components/RisksComponent";
+import { StrategiesComponent } from "./components/StrategiesComponent";
+import { WhitepaperComponent } from "./components/WhitepaperComponent";
+import { LandingComponent } from "./components/LandingComponent";
+import { Container } from 'react-bootstrap';
 
 
 function App() {
 
-  const [todos, setTodos] = React.useState<ITodos>({todos: []});
-  const addTodos = (title: string) => {
-    setTodos({
-      todos: [
-        {title, completed: false, id: todos.todos.length+1},
-        ...todos.todos
-      ]
-    });
-  };
-  const deleteTodos = (id: number) => {
-    setTodos({
-      todos: todos.todos.filter(t => t.id !== id)
-    });
-  };
-  const toggleTodos = (id: number) => {
-    setTodos({
-      todos: todos.todos.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo)
-    });
-  }
-
   return (
     <div className="App">
-      <NavbarComponent/>
-      <TradeWindowComponent/>
+      
+      <BrowserRouter>
+        <NavbarComponent/>  
+        <Container>
+          <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/trade" element={<TradeWindowComponent />} />
+              <Route path="/lp" element={<LPComponent />} />
+              <Route path="/risks" element={<RisksComponent />} />
+              <Route path="/strategies" element={<StrategiesComponent />} />
+              <Route path="/whitepaper" element={<WhitepaperComponent />} />
+              <Route path="/landing" element={<LandingComponent />} />
+          </Routes>
+        </Container>
+      </BrowserRouter>
     </div>
   )
 }
