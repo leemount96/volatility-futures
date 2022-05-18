@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './App.css';
 import TradeWindowComponent from './components/TradeWindow';
 import { NavbarComponent } from './components/NavbarComponent';
+import { DepositComponent } from './components/DepositComponent';
 import { HomeComponent as Home } from "./components/Home";
 import { LPComponent } from "./components/LPComponent";
 import { RisksComponent } from "./components/RisksComponent";
@@ -22,6 +23,7 @@ function App() {
         <Container>
           <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/deposit" element={<DepositComponent />} />
               <Route path="/trade" element={<TradeWindowComponent />} />
               <Route path="/lp" element={<LPComponent />} />
               <Route path="/risks" element={<RisksComponent />} />

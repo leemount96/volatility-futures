@@ -1,3 +1,5 @@
+const { ethers } = require("hardhat");
+
 async function main() {
     const maxSupply = 100000;
     const USDC = await hre.ethers.getContractFactory("USDCMock");
@@ -6,6 +8,8 @@ async function main() {
     await usdc.deployed();
 
     console.log("USDC deployed to:", usdc.address);
+
+    const METAMASK_PUBKEY = "0x510B1130057b44A7Af60c3CF257528821eB2465C";
 
     const initEVIXLevel = 100;
 
@@ -34,6 +38,19 @@ async function main() {
     await perpMarginPool.deployed();
 
     console.log("Margin pool deployed to:", perpMarginPool.address);
+
+    await usdc.transfer(METAMASK_PUBKEY, 50000);
+
+    console.log("Transferred 50,000 mock USDC to: ", METAMASK_PUBKEY);
+
+    const [owner] = await hre.ethers.getSigners();
+
+    const txHash = await owner.sendTransaction({
+      to: METAMASK_PUBKEY,
+      value: ethers.utils.parseEther("1.0"),
+    });
+
+    console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY);
 }
 
 main().catch((error) => {
