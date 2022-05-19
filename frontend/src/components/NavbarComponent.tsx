@@ -31,8 +31,8 @@ export const NavbarComponent = () => {
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/whitepaper" href="#whitepaper">Whitepaper</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/landing" href="#action/3.4">
-                Landing Page
+              <NavDropdown.Item as={Link} to="/team" href="#action/3.4">
+                Team
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>

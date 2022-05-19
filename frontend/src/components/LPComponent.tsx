@@ -71,6 +71,13 @@ export const LPComponent = () => {
     updateCollateralAmount({amount: parseInt(val.toString())});
   }
 
+  const SendToLiquidityPool = async (event: any) => {
+    event.preventDefault();
+    let lpAmount = parseInt(event.target.lpAmount.value);
+    await marginpool.functions.provideLiquidity(lpAmount);
+    
+  }
+
   const [lpPosition, updateLP] = useState({
     hasPosition: false,
     USDCAmount: 0,
@@ -136,11 +143,16 @@ export const LPComponent = () => {
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
+          Provide Liquidity
           <InputGroup className="mb-3">
-            <Button variant="outline-secondary" id="button-addon1">
-              LP
-            </Button>
-            <FormControl aria-label="USDC" aria-describedby="basic-addon1" />
+            <form onSubmit={SendToLiquidityPool}>
+              <input
+                id="lpAmount"
+                type="text"
+                placeholder="Amount of USDC to LP"
+              />
+              <Button type={"submit"}>Send to LP</Button>
+            </form>
           </InputGroup>
         </Card.Body>
       </Card>

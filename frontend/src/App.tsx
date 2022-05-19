@@ -9,7 +9,7 @@ import { LPComponent } from "./components/LPComponent";
 import { RisksComponent } from "./components/RisksComponent";
 import { StrategiesComponent } from "./components/StrategiesComponent";
 import { WhitepaperComponent } from "./components/WhitepaperComponent";
-import { LandingComponent } from "./components/LandingComponent";
+import { TeamComponent } from "./components/TeamComponent";
 import { Container } from 'react-bootstrap';
 
 
@@ -29,7 +29,7 @@ function App() {
               <Route path="/risks" element={<RisksComponent />} />
               <Route path="/strategies" element={<StrategiesComponent />} />
               <Route path="/whitepaper" element={<WhitepaperComponent />} />
-              <Route path="/landing" element={<LandingComponent />} />
+              <Route path="/team" element={<TeamComponent />} />
           </Routes>
         </Container>
       </BrowserRouter>
