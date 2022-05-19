@@ -38,6 +38,10 @@ const marginpool = new ethers.Contract(
 const TradeWindowComponent = () => {
   const [EVIXOraclePrice, updateEVIXOraclePrice] = useState();
   const [EVIXPoolPrice, updateEVIXPoolPrice] = useState();
+  const [PoolState, updatePoolState] = useState({
+    amountUSDC: 0,
+    amountEVIX: 0,
+  });
 
   const [connectedAddress, updateConnectedAddress] = useState({
     address: "",
@@ -68,6 +72,15 @@ const TradeWindowComponent = () => {
     updateCollateralAmount({ amount: parseInt(val.toString()) });
   };
 
+  const GetPoolState = async () => {
+    let USDCAmount = await vpool.functions.poolUSDC();
+    let EVIXAmount = await vpool.functions.poolVPerp();
+    updatePoolState({
+      amountUSDC: parseInt(USDCAmount.toString()),
+      amountEVIX: parseInt(EVIXAmount.toString()),
+    });
+  };
+
   const [tradePosition, updatePosition] = useState({
     hasPosition: false,
     EVIXAmount: 0,
@@ -85,6 +98,7 @@ const TradeWindowComponent = () => {
   GetCollateralAmount();
   GetEVIXIndexMark();
   GetEVIXPoolPrice();
+  GetPoolState();
 
   let tradeCard;
 
@@ -107,6 +121,14 @@ const TradeWindowComponent = () => {
           <ListGroupItem>
             Current EVIX Index Mark:
             {EVIXOraclePrice}
+          </ListGroupItem>
+          <ListGroupItem>
+            USDC In Pool:
+            {PoolState.amountUSDC}{" "}
+          </ListGroupItem>
+          <ListGroupItem>
+            EVIX In Pool:
+            {PoolState.amountEVIX}{" "}
           </ListGroupItem>
           <ListGroupItem>
             Position Size: {tradePosition.EVIXAmount}
@@ -144,6 +166,14 @@ const TradeWindowComponent = () => {
           <ListGroupItem>
             Current EVIX Index Mark:
             {EVIXOraclePrice}
+          </ListGroupItem>
+          <ListGroupItem>
+            USDC In Pool:
+            {PoolState.amountUSDC}{" "}
+          </ListGroupItem>
+          <ListGroupItem>
+            EVIX In Pool:
+            {PoolState.amountEVIX}{" "}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>

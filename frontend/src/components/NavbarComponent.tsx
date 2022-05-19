@@ -44,6 +44,9 @@ export const NavbarComponent = () => {
                 Team
               </NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link as={Link} to="/admin" href="admin">
+              ADMIN
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">

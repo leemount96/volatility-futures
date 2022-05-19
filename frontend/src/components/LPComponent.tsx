@@ -112,6 +112,10 @@ export const LPComponent = () => {
             {EVIXPoolPrice}
           </ListGroupItem>
           <ListGroupItem>
+            Current EVIX Index Mark:
+            {EVIXOraclePrice}
+          </ListGroupItem>
+          <ListGroupItem>
             USDC In Pool:
             {PoolState.amountUSDC}{" "}
           </ListGroupItem>
@@ -140,6 +144,10 @@ export const LPComponent = () => {
           <ListGroupItem>
             Current EVIX Pool Price:
             {EVIXPoolPrice}
+          </ListGroupItem>
+          <ListGroupItem>
+            Current EVIX Index Mark:
+            {EVIXOraclePrice}
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:

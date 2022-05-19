@@ -11,6 +11,8 @@ describe("VPerp", function () {
   let addr1;
   let addrs;
 
+  let squeethAddress = "0x59f0c781a6ec387f09c40faa22b7477a2950d209";
+
   let initEVIXLevel = 10;
 
   // runs before each test
@@ -19,7 +21,7 @@ describe("VPerp", function () {
     Oracle = await ethers.getContractFactory("Oracle");
     [owner, addr1, ...addrs] = await ethers.getSigners();
 
-    deployedOracle = await Oracle.deploy(initEVIXLevel);
+    deployedOracle = await Oracle.deploy(initEVIXLevel, squeethAddress);
   });
 
   describe("Oracle Deployment", function () {
@@ -30,14 +32,26 @@ describe("VPerp", function () {
 
   describe("Updating price", function () {
     it("Update price from owner", async function () {
-      await deployedOracle.connect(owner).updateSpotLevel(12);
+      await deployedOracle.connect(owner).manualUpdateSpotLevel(12);
       expect(await deployedOracle.spotEVIXLevel()).to.equal(12);
     });
 
     it("Attempt to update from non-onwer", async function () {
       await expect(
-        deployedOracle.connect(addr1).updateSpotLevel(12)
+        deployedOracle.connect(addr1).manualUpdateSpotLevel(12)
       ).to.be.revertedWith("Only owner can update");
     });
   });
+
+  describe("Squeeth calculations", function () {
+    it("Check math on squeeth calculation", async function () {
+      await deployedOracle.connect(owner).updateSpotFromSqueeth();
+      let expNorm = 667470490629307856;
+      let curNorm = 668359241497821737;
+      let funding = 1 - expNorm/curNorm;
+      let IV =  Math.sqrt(365/17.5*funding);
+      console.log(funding);
+      console.log(IV*10**18);
+    })
+  })
 });

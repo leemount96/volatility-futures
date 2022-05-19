@@ -10,11 +10,12 @@ async function main() {
   console.log("USDC deployed to:", usdc.address);
 
   const METAMASK_PUBKEY = "0x510B1130057b44A7Af60c3CF257528821eB2465C";
+  const SQUEETH_ROPSTEN_ADDRESS = "0x59f0c781a6ec387f09c40faa22b7477a2950d209";
 
   const initEVIXLevel = 100;
 
   const Oracle = await hre.ethers.getContractFactory("Oracle");
-  const oracle = await Oracle.deploy(initEVIXLevel);
+  const oracle = await Oracle.deploy(initEVIXLevel, SQUEETH_ROPSTEN_ADDRESS);
 
   await oracle.deployed();
 

@@ -10,6 +10,7 @@ import { RisksComponent } from "./components/RisksComponent";
 import { StrategiesComponent } from "./components/StrategiesComponent";
 import { WhitepaperComponent } from "./components/WhitepaperComponent";
 import { TeamComponent } from "./components/TeamComponent";
+import { AdminComponent } from "./components/AdminComponent";
 import { Container } from "react-bootstrap";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route path="/strategies" element={<StrategiesComponent />} />
             <Route path="/whitepaper" element={<WhitepaperComponent />} />
             <Route path="/team" element={<TeamComponent />} />
+            <Route path="/admin" element={<AdminComponent />} />
           </Routes>
         </Container>
       </BrowserRouter>
