@@ -29,19 +29,23 @@ const vpool = new ethers.Contract(VPOOL_ADDRESS, vpoolAbi, signer);
 
 const MARGINPOOL_ADDRESS = process.env.REACT_APP_MARGINPOOL_ADDRESS!;
 const marginpoolAbi = marginpoolJson.abi;
-const marginpool = new ethers.Contract(MARGINPOOL_ADDRESS, marginpoolAbi, signer);
+const marginpool = new ethers.Contract(
+  MARGINPOOL_ADDRESS,
+  marginpoolAbi,
+  signer
+);
 
 const TradeWindowComponent = () => {
   const [EVIXOraclePrice, updateEVIXOraclePrice] = useState();
   const [EVIXPoolPrice, updateEVIXPoolPrice] = useState();
 
   const [connectedAddress, updateConnectedAddress] = useState({
-    address: ""
-})
+    address: "",
+  });
 
-const [collateralAmount, updateCollateralAmount] = useState({
-  amount: 0,
-})
+  const [collateralAmount, updateCollateralAmount] = useState({
+    amount: 0,
+  });
 
   const GetEVIXIndexMark = async () => {
     let val = await oracle.functions.spotEVIXLevel();
@@ -54,14 +58,15 @@ const [collateralAmount, updateCollateralAmount] = useState({
   };
 
   const GetConnectedWalletAddress = async () => {
-    window.ethereum.request({method: "eth_requestAccounts" })
-    .then((res: any) => updateConnectedAddress(res[0]))
-  }
+    window.ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((res: any) => updateConnectedAddress(res[0]));
+  };
 
   const GetCollateralAmount = async () => {
     let val = await marginpool.functions.freeCollateralMap(connectedAddress);
-    updateCollateralAmount({amount: parseInt(val.toString())});
-  }
+    updateCollateralAmount({ amount: parseInt(val.toString()) });
+  };
 
   const [tradePosition, updatePosition] = useState({
     hasPosition: false,
@@ -91,7 +96,8 @@ const [collateralAmount, updateCollateralAmount] = useState({
           <Card.Text>Window for closing existing position</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
-          <ListGroupItem>Current Collateral: 
+          <ListGroupItem>
+            Current Collateral:
             {collateralAmount.amount}
           </ListGroupItem>
           <ListGroupItem>
@@ -127,8 +133,9 @@ const [collateralAmount, updateCollateralAmount] = useState({
           </Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
-          <ListGroupItem>Available Collateral: 
-          {collateralAmount.amount}
+          <ListGroupItem>
+            Available Collateral:
+            {collateralAmount.amount}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:

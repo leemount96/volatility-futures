@@ -1,8 +1,8 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css");
 
-body{
-    background:#f5f5f5;
-    margin-top:20px;
+body {
+  background: #f5f5f5;
+  margin-top: 20px;
 }
 
 .team-list img {
@@ -20,15 +20,17 @@ body{
 
 .team-list:hover {
   -webkit-transform: scale(1.05);
-          transform: scale(1.05);
+  transform: scale(1.05);
 }
 
-.team, .team-list {
+.team,
+.team-list {
   -webkit-transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0s;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0s;
 }
 
-.team .content .title, .team-list .content .title {
+.team .content .title,
+.team-list .content .title {
   font-size: 18px;
 }
 
@@ -43,7 +45,8 @@ body{
   transition: all 0.5s ease;
 }
 
-.team .member-position, .team .team-social {
+.team .member-position,
+.team .team-social {
   position: absolute;
   bottom: -35px;
   right: 0;
@@ -61,9 +64,9 @@ body{
 
 .team:hover {
   -webkit-transform: translateY(-7px);
-          transform: translateY(-7px);
+  transform: translateY(-7px);
   -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
 }
 
 .team:hover .overlay {
@@ -88,8 +91,8 @@ body{
 }
 
 .list-inline-item:not(:last-child) {
-    margin-right: 0px;
-    margin-bottom: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
 }
 
 .rounded {
@@ -97,25 +100,25 @@ body{
 }
 
 .social-icon.social li a {
-    color: #adb5bd;
-    border-color: #adb5bd;
+  color: #adb5bd;
+  border-color: #adb5bd;
 }
 
 .social-icon li a {
-    color: #35404e;
-    border: 1px solid #35404e;
-    display: inline-block;
-    height: 32px;
-    text-align: center;
-    font-size: 15px;
-    width: 32px;
-    line-height: 30px;
-    -webkit-transition: all 0.4s ease;
-    transition: all 0.4s ease;
-    overflow: hidden;
-    position: relative;
+  color: #35404e;
+  border: 1px solid #35404e;
+  display: inline-block;
+  height: 32px;
+  text-align: center;
+  font-size: 15px;
+  width: 32px;
+  line-height: 30px;
+  -webkit-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  overflow: hidden;
+  position: relative;
 }
 
 a {
-    text-decoration: none !important;
+  text-decoration: none !important;
 }

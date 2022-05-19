@@ -21,24 +21,28 @@ const MARGINPOOL_ADDRESS = process.env.REACT_APP_MARGINPOOL_ADDRESS!;
 const VPOOL_ADDRESS = process.env.REACT_APP_VPOOL_ADDRESS!;
 
 export const HomeComponent = () => {
+  const [depositedUSDC, updateDepositedUSDC] = useState({
+    amount: 0,
+  });
 
-    const[depositedUSDC, updateDepositedUSDC] = useState({
-        amount: 0,
-    })
+  const GetDespositedTotal = async () => {
+    let valMarginPool = await usdc.functions.balanceOf(MARGINPOOL_ADDRESS);
+    let valVPool = await usdc.functions.balanceOf(VPOOL_ADDRESS);
+    updateDepositedUSDC({
+      amount:
+        parseInt(valMarginPool.toString()) + parseInt(valVPool.toString()),
+    });
+  };
 
-    const GetDespositedTotal = async () => {
-        let valMarginPool = await usdc.functions.balanceOf(MARGINPOOL_ADDRESS);
-        let valVPool = await usdc.functions.balanceOf(VPOOL_ADDRESS);
-        updateDepositedUSDC({amount: parseInt(valMarginPool.toString()) + parseInt(valVPool.toString())})
-    }
-
-    GetDespositedTotal();
+  GetDespositedTotal();
 
   return (
     <Card style={{ width: "18rem" }} className="text-center me-5 mt-5">
       <Card.Body>
         <Card.Title>Total USDC Deposited</Card.Title>
-        <Card.Text className="text-center">{depositedUSDC.amount} USDC</Card.Text>
+        <Card.Text className="text-center">
+          {depositedUSDC.amount} USDC
+        </Card.Text>
       </Card.Body>
     </Card>
   );

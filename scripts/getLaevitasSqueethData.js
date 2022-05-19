@@ -1,19 +1,18 @@
-const fetch = require('node-fetch');
-require('dotenv').config({path: '../.env'});
+const fetch = require("node-fetch");
+require("dotenv").config({ path: "../.env" });
 
 const laevitasKey = process.env.LAEVITAS_API_KEY;
-console.log(laevitasKey)
+console.log(laevitasKey);
 
 async function getSqueethData() {
-
   const response = await fetch(
-    'https://gateway.laevitas.ch/analytics/defi/squeeth',
+    "https://gateway.laevitas.ch/analytics/defi/squeeth",
     {
-      method: 'get',
+      method: "get",
       body: null,
       headers: {
-        'apiKey': laevitasKey,
-        'User-Agent': 'Node',
+        apiKey: laevitasKey,
+        "User-Agent": "Node",
       },
     }
   );
@@ -21,7 +20,6 @@ async function getSqueethData() {
   const json = await response.json();
   return json;
 }
-
 
 async function main() {
   const squeethJson = await getSqueethData();

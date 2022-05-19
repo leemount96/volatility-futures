@@ -47,7 +47,9 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@types/react-pdf": "^5.7.2",
     "dotenv-webpack": "^7.1.0",
-    "ethers": "^5.6.6"
+    "ethers": "^5.6.6",
+    "react-pdf": "^5.7.2"
   }
 }

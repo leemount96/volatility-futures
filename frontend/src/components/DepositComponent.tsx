@@ -81,9 +81,7 @@ export const DepositComponent = () => {
       <Card style={{ width: "18rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Manage Collateral</Card.Title>
-          <Card.Text>
-            Window for manging collateral in margin pool
-          </Card.Text>
+          <Card.Text>Window for manging collateral in margin pool</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>

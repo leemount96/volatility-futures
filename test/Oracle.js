@@ -20,22 +20,24 @@ describe("VPerp", function () {
     [owner, addr1, ...addrs] = await ethers.getSigners();
 
     deployedOracle = await Oracle.deploy(initEVIXLevel);
-  })
-
-  describe("Oracle Deployment", function (){
-    it("Deploying Oracle should set initial price", async function () {
-        expect(await deployedOracle.spotEVIXLevel()).to.equal(initEVIXLevel);
-    })
   });
 
-  describe("Updating price", function (){
-    it("Update price from owner", async function () {
-        await deployedOracle.connect(owner).updateSpotLevel(12);
-        expect(await deployedOracle.spotEVIXLevel()).to.equal(12);
-    })
+  describe("Oracle Deployment", function () {
+    it("Deploying Oracle should set initial price", async function () {
+      expect(await deployedOracle.spotEVIXLevel()).to.equal(initEVIXLevel);
+    });
+  });
 
-    it("Attempt to update from non-onwer", async function () { 
-        await expect(deployedOracle.connect(addr1).updateSpotLevel(12)).to.be.revertedWith("Only owner can update");
-    })
+  describe("Updating price", function () {
+    it("Update price from owner", async function () {
+      await deployedOracle.connect(owner).updateSpotLevel(12);
+      expect(await deployedOracle.spotEVIXLevel()).to.equal(12);
+    });
+
+    it("Attempt to update from non-onwer", async function () {
+      await expect(
+        deployedOracle.connect(addr1).updateSpotLevel(12)
+      ).to.be.revertedWith("Only owner can update");
+    });
   });
 });

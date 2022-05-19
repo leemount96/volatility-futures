@@ -1,8 +1,8 @@
 const hre = require("hardhat");
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 const ethers = require("ethers");
-require('dotenv').config({path: '../.env'});
-const oracleJson = require('../artifacts/contracts/core/Oracle.sol/Oracle.json');
+require("dotenv").config({ path: "../.env" });
+const oracleJson = require("../artifacts/contracts/core/Oracle.sol/Oracle.json");
 const oracleAbi = oracleJson.abi;
 
 async function getVolLevel() {

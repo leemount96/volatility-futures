@@ -27,7 +27,11 @@ const vpool = new ethers.Contract(VPOOL_ADDRESS, vpoolAbi, signer);
 
 const MARGINPOOL_ADDRESS = process.env.REACT_APP_MARGINPOOL_ADDRESS!;
 const marginpoolAbi = marginpoolJson.abi;
-const marginpool = new ethers.Contract(MARGINPOOL_ADDRESS, marginpoolAbi, signer);
+const marginpool = new ethers.Contract(
+  MARGINPOOL_ADDRESS,
+  marginpoolAbi,
+  signer
+);
 
 export const LPComponent = () => {
   const [EVIXOraclePrice, updateEVIXOraclePrice] = useState();
@@ -38,12 +42,12 @@ export const LPComponent = () => {
   });
 
   const [connectedAddress, updateConnectedAddress] = useState({
-    address: ""
-})
+    address: "",
+  });
 
   const [collateralAmount, updateCollateralAmount] = useState({
-      amount: 0,
-  })
+    amount: 0,
+  });
 
   const GetEVIXIndexMark = async () => {
     let val = await oracle.functions.spotEVIXLevel();
@@ -56,27 +60,30 @@ export const LPComponent = () => {
   };
 
   const GetConnectedWalletAddress = async () => {
-    window.ethereum.request({method: "eth_requestAccounts" })
-    .then((res: any) => updateConnectedAddress(res[0]))
-  }
+    window.ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((res: any) => updateConnectedAddress(res[0]));
+  };
 
   const GetPoolState = async () => {
     let USDCAmount = await vpool.functions.poolUSDC();
     let EVIXAmount = await vpool.functions.poolVPerp();
-    updatePoolState({ amountUSDC: parseInt(USDCAmount.toString()), amountEVIX: parseInt(EVIXAmount.toString()) });
+    updatePoolState({
+      amountUSDC: parseInt(USDCAmount.toString()),
+      amountEVIX: parseInt(EVIXAmount.toString()),
+    });
   };
 
   const GetCollateralAmount = async () => {
     let val = await marginpool.functions.freeCollateralMap(connectedAddress);
-    updateCollateralAmount({amount: parseInt(val.toString())});
-  }
+    updateCollateralAmount({ amount: parseInt(val.toString()) });
+  };
 
   const SendToLiquidityPool = async (event: any) => {
     event.preventDefault();
     let lpAmount = parseInt(event.target.lpAmount.value);
     await marginpool.functions.provideLiquidity(lpAmount);
-    
-  }
+  };
 
   const [lpPosition, updateLP] = useState({
     hasPosition: false,
@@ -126,8 +133,9 @@ export const LPComponent = () => {
           <Card.Text>Window for providing liquidity in EVIX AMM Pool</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
-          <ListGroupItem>Available Collateral: 
-              {collateralAmount.amount}
+          <ListGroupItem>
+            Available Collateral:
+            {collateralAmount.amount}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
