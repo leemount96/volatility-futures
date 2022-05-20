@@ -41,6 +41,12 @@ export const LPComponent = () => {
     amountEVIX: 0,
   });
 
+  const [lpPosition, updateLP] = useState({
+    hasPosition: false,
+    USDCAmount: 0,
+    EVIXAmount: 0,
+  });
+
   const [connectedAddress, updateConnectedAddress] = useState({
     address: "",
   });
@@ -83,19 +89,41 @@ export const LPComponent = () => {
     event.preventDefault();
     let lpAmount = parseInt(event.target.lpAmount.value);
     await marginpool.functions.provideLiquidity(lpAmount);
+
+    updateLP({
+      hasPosition: true,
+      USDCAmount: lpAmount,
+      EVIXAmount: lpAmount/parseInt(EVIXPoolPrice!),
+    })
   };
 
-  const [lpPosition, updateLP] = useState({
-    hasPosition: false,
-    USDCAmount: 0,
-    EVIXAmount: 0,
-  });
+  const removeLiquidityHandler = async () => {
+    await marginpool.functions.removeLiquidity();
+    updateLP({
+      hasPosition: false,
+      USDCAmount: 0,
+      EVIXAmount: 0
+    })
+  }
+
+  const GetLPState = async () => {
+    let lpPosition = await vpool.functions.getPosition(connectedAddress);
+    lpPosition = lpPosition[0];
+    if (lpPosition.amountUSDC.toNumber() > 0){
+      updateLP({
+        hasPosition: true,
+        USDCAmount: lpPosition.amountUSDC.toNumber(),
+        EVIXAmount: lpPosition.amountVPerp.toNumber(),
+      })
+    }
+  }
 
   GetConnectedWalletAddress();
   GetCollateralAmount();
   GetEVIXIndexMark();
   GetEVIXPoolPrice();
   GetPoolState();
+  GetLPState();
 
   let lpCard;
 
@@ -125,7 +153,14 @@ export const LPComponent = () => {
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          <Button variant="danger">Remove Liquidity</Button>
+          Current Position:
+          <Card.Body>
+            USDC: {lpPosition.USDCAmount.toString()}
+          </Card.Body>
+          <Card.Body>
+            EVIX: {lpPosition.EVIXAmount.toString()}
+          </Card.Body>
+          <Button variant="danger" onClick={removeLiquidityHandler}>Remove Liquidity</Button>
         </Card.Body>
       </Card>
     );

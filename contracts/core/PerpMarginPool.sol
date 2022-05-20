@@ -137,6 +137,10 @@ contract PerpMarginPool {
         freeCollateralMap[msg.sender] += returnedUSDC;
     }
 
+    function settleAllFunding() public {
+        //TODO
+    }   
+
     function _settleFunding(address _user) public {
         require(positions[_user].amountVPerp != 0, "No open positions");
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component } from "react";
+import React, { useState } from "react";
 import { ethers } from "ethers";
 import oracleJson from "../abis/Oracle.json";
 import vpoolJson from "../abis/PerpVPool.json";
@@ -10,9 +10,6 @@ import {
   ListGroup,
   ListGroupItem,
   InputGroup,
-  DropdownButton,
-  Dropdown,
-  FormControl,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -51,6 +48,13 @@ const TradeWindowComponent = () => {
     amount: 0,
   });
 
+  const [tradePosition, updatePosition] = useState({
+    hasPosition: false,
+    EVIXAmount: 0,
+    fundingPNL: 0,
+    openingPrice: 0,
+  });
+
   const GetEVIXIndexMark = async () => {
     let val = await oracle.functions.spotEVIXLevel();
     updateEVIXOraclePrice(val.toString());
@@ -81,24 +85,79 @@ const TradeWindowComponent = () => {
     });
   };
 
-  const [tradePosition, updatePosition] = useState({
-    hasPosition: false,
-    EVIXAmount: 0,
-    fundingPNL: 0,
-    openingPrice: 0,
-  });
+  const GetPositionState = async () => {
+    let position = await marginpool.functions.positions(connectedAddress);
+    if (position.amountVPerp.toNumber() !== 0){
+      updatePosition({
+        hasPosition: true,
+        EVIXAmount: position.amountVPerp.toNumber(),
+        fundingPNL: position.fundingPNL.toNumber(),
+        openingPrice: position.tradedPrice.toNumber(),
+      })
+    }
+  };
 
-  const setBuy = () => {};
 
-  const setSell = () => {};
+  const submitBuyLong = async (event: any) => {
+    event.preventDefault();
+    let tradeAmount = parseInt(event.target.tradeAmount.value);
+    let USDCAmount = tradeAmount * parseInt(EVIXPoolPrice!);
+    await marginpool.functions.openLongPosition(USDCAmount);
+    let position = await marginpool.functions.positions(connectedAddress);
 
-  const submitTrade = () => {};
+    updatePosition({
+      hasPosition: true,
+      EVIXAmount: position.amountVPerp.toNumber(),
+      fundingPNL: 0,
+      openingPrice: position.tradedPrice.toNumber(),
+    })
+
+    await GetEVIXPoolPrice();
+  };
+
+  const submitSellShort = async (event: any) => {
+    event.preventDefault();
+    let tradeAmount = parseInt(event.target.tradeAmount.value);
+    let USDCAmount = tradeAmount * parseInt(EVIXPoolPrice!);
+    await marginpool.functions.openShortPosition(USDCAmount);
+    let position = await marginpool.functions.positions(connectedAddress);
+    
+    updatePosition({
+      hasPosition: true,
+      EVIXAmount: position.amountVPerp.toNumber(),
+      fundingPNL: 0,
+      openingPrice: position.tradedPrice.toNumber(),
+    })
+
+    await GetEVIXPoolPrice();
+  };
+
+  const submitCloseLong = async () => {
+    await marginpool.functions.closeLongPosition();
+    updatePosition({
+      hasPosition: false,
+      EVIXAmount: 0,
+      fundingPNL: 0,
+      openingPrice: 0
+    })
+  }
+
+  const submitCloseShort = async () => {
+    await marginpool.functions.closeShortPosition();
+    updatePosition({
+      hasPosition: false,
+      EVIXAmount: 0,
+      fundingPNL: 0,
+      openingPrice: 0
+    })
+  }
 
   GetConnectedWalletAddress();
   GetCollateralAmount();
   GetEVIXIndexMark();
   GetEVIXPoolPrice();
   GetPoolState();
+  GetPositionState();
 
   let tradeCard;
 
@@ -131,17 +190,19 @@ const TradeWindowComponent = () => {
             {PoolState.amountEVIX}{" "}
           </ListGroupItem>
           <ListGroupItem>
-            Position Size: {tradePosition.EVIXAmount}
+            Position Size: {tradePosition.EVIXAmount.toString()}
           </ListGroupItem>
           <ListGroupItem>
-            Accrued Funding: {tradePosition.fundingPNL}
+            Accrued Funding: {tradePosition.fundingPNL.toString()}
           </ListGroupItem>
           <ListGroupItem>
-            Opening Price: {tradePosition.openingPrice}
+            Opening Price: {tradePosition.openingPrice.toString()}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          <Button variant="primary">Close Position</Button>
+          {tradePosition.EVIXAmount > 0
+          ? <Button variant="primary" onClick={submitCloseLong}>Close Long Position</Button>
+          : <Button variant="danger" onClick={submitCloseShort}>Close Short Position</Button>}  
         </Card.Body>
       </Card>
     );
@@ -178,23 +239,29 @@ const TradeWindowComponent = () => {
         </ListGroup>
         <Card.Body>
           <InputGroup className="mb-3">
-            <DropdownButton
-              variant="outline-secondary"
-              title="Buy"
-              id="input-group-dropdown-1"
-            >
-              <Dropdown.Item onClick={setBuy} href="#">
-                Buy
-              </Dropdown.Item>
-              <Dropdown.Item onClick={setSell} href="#">
-                Sell
-              </Dropdown.Item>
-            </DropdownButton>
-            <FormControl aria-label="Text input with dropdown button" />
+          <form onSubmit={submitBuyLong}>
+            <input
+              id="tradeAmount"
+              type="text"
+              placeholder="Amount of EVIX"
+            />
+            <Button type={"submit"}>
+              Buy
+            </Button>
+          </form>
           </InputGroup>
-          <Button variant="primary" onClick={submitTrade}>
-            Submit Trade
-          </Button>
+          <InputGroup className="mb-3">
+          <form onSubmit={submitSellShort}>
+            <input
+              id="tradeAmount"
+              type="text"
+              placeholder="Amount of EVIX"
+            />
+            <Button type={"submit"} variant="danger">
+              Sell
+            </Button>
+          </form>
+          </InputGroup>
         </Card.Body>
       </Card>
     );

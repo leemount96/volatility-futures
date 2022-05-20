@@ -65,8 +65,10 @@ export const DepositComponent = () => {
     GetCollateral();
   };
 
-  const withdrawHandler = async () => {
-    marginpool.functions.returnCollateral(collateralAmount.amount);
+  const withdrawHandler = async (event: any) => {
+    event.preventDefault();
+    let withdrawAmount = parseInt(event.target.withdrawAmount.value);
+    marginpool.functions.returnCollateral(withdrawAmount);
     GetCollateral();
   };
 
@@ -90,9 +92,17 @@ export const DepositComponent = () => {
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          <Button variant="danger" onClick={withdrawHandler}>
-            Withdraw Collateral
-          </Button>
+          Withdraw Colateral
+          <InputGroup className="mb-3">
+            <form onSubmit={withdrawHandler}>
+              <input
+                id="withdrawAmount"
+                type="text"
+                placeholder="Amount of USDC"
+              />
+              <Button type={"submit"}>Withdraw </Button>
+            </form>
+          </InputGroup>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>

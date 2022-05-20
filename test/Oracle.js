@@ -48,10 +48,11 @@ describe("VPerp", function () {
       await deployedOracle.connect(owner).updateSpotFromSqueeth();
       let expNorm = 667470490629307856;
       let curNorm = 668359241497821737;
-      let funding = 1 - expNorm/curNorm;
+      let funding = (curNorm - expNorm)/curNorm;
       let IV =  Math.sqrt(365/17.5*funding);
       console.log(funding);
-      console.log(IV*10**18);
+      console.log(IV);
+      console.log(await deployedOracle.spotEVIXLevel());
     })
   })
 });

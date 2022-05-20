@@ -21,18 +21,24 @@ contract Oracle {
         owner = msg.sender;
     }
 
-    function manualUpdateSpotLevel(uint256 _newSpotLevel) public onlyOwner{
+    function manualUpdateSpotLevel(uint256 _newSpotLevel) public{
         spotEVIXLevel = _newSpotLevel;
     }
 
-    function updateSpotFromSqueeth() public onlyOwner returns(uint256){
-        //uint256 expectedNormalization = ISqueethController(squeethAddress).getExpectedNormalizationFactor();
-        //uint128 currentNormalization = ISqueethController(squeethAddress).normalizationFactor();
-        uint256 expectedNormalization = 667470490629307856;
-        uint128 currentNormalization = 668359241497821737;
-        uint256 fundingRate = ((currentNormalization - expectedNormalization)*10**18)/currentNormalization;
-        //int128 IV = ABDKMath64x64.sqrt(3650/175*fundingRate);
-        console.log(fundingRate);
-        return fundingRate;
+    function updateSpotFromSqueeth() public{
+        // int256 expectedNormalization = int256(ISqueethController(squeethAddress).getExpectedNormalizationFactor());
+        // int128 currentNormalization = int128(ISqueethController(squeethAddress).normalizationFactor());
+
+        int256 expectedNormalization = 667470490629307856;
+        int128 currentNormalization = 668359241497821737;
+
+        int128 expectedNormalization128 = ABDKMath64x64.fromInt(expectedNormalization);
+        currentNormalization = ABDKMath64x64.fromInt(currentNormalization);
+        int128 timeFactor = ABDKMath64x64.fromInt(4566962103755937000);
+
+        int128 fundingRate = ABDKMath64x64.div(currentNormalization - expectedNormalization128, currentNormalization);
+        int128 IV = ABDKMath64x64.mul(ABDKMath64x64.sqrt(fundingRate), timeFactor);
+
+        spotEVIXLevel = uint256(ABDKMath64x64.toUInt(IV));
     }
 }

@@ -8,6 +8,8 @@ contract PerpVPool{
     uint256 public price;
     uint256 public poolUSDC;
     uint256 public poolVPerp;
+    uint256 public tradedVolume;
+    uint256 public feePercentage;
 
     address public tUSDCAddress;
 
@@ -19,12 +21,15 @@ contract PerpVPool{
         uint256 amountUSDC;
         uint256 amountVPerp;
         uint256 initPrice;
+        uint256 volumeAtPositionInitiation;
     }
 
     constructor(uint256 _initPrice, address USDCAddress){ // solhint-disable-line
         price = _initPrice;
         poolUSDC = 0;
         poolVPerp = 0;
+        tradedVolume = 0;
+        feePercentage = 1;
 
         tUSDCAddress = USDCAddress;
     }
@@ -32,17 +37,37 @@ contract PerpVPool{
     function provideLiquidity(address _user, uint256 _amountUSDC) public {
         require(positions[_user].amountUSDC == 0 && positions[_user].amountVPerp == 0, "User has position already");
         require(ERC20(tUSDCAddress).balanceOf(_user) >= _amountUSDC, "Not enough USDC in wallet");
-        
-        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
-        
+                
         poolUSDC += _amountUSDC;
         poolVPerp += _amountUSDC/price;
 
-        positions[_user] = LPPosition(_amountUSDC, _amountUSDC/price, price);
+        ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), _amountUSDC);
+
+        positions[_user] = LPPosition(_amountUSDC, _amountUSDC/price, price, tradedVolume);
     }
 
-    function removeLiquidity(address _user) public returns (uint256) { // solhint-disable-line
-        //TODO
+    function removeLiquidity(address _user) public returns (uint256){ 
+        uint256 k = poolUSDC * poolVPerp;
+        uint256 positionK = positions[_user].amountUSDC * positions[_user].amountVPerp;
+        uint256 currentUSDC = poolUSDC * positionK / k;
+        uint256 currentVPerp = poolVPerp * positionK / k;
+
+        // don't think this is necessary but wanted to go through the math
+        // int256 perpValueChange = int256(positions[_user].amountVPerp * positions[_user].initPrice) - int256(currentVPerp * price);
+        // int256 USDCToReturn = int256(currentUSDC) + perpValueChange;
+
+        //TODO: Implement returning deposit + fees
+
+        poolUSDC -= currentUSDC;
+        poolVPerp -= currentVPerp;
+
+        uint256 returnedUSDC = positions[_user].amountUSDC;
+
+        positions[_user] = LPPosition(0,0,0,0);
+
+        ERC20(tUSDCAddress).transfer(msg.sender, returnedUSDC);
+        
+        return returnedUSDC;
     }
 
     function buy(uint256 _amountUSDC) public returns (uint256, uint256){
@@ -52,6 +77,8 @@ contract PerpVPool{
         uint256 k = poolUSDC * poolVPerp;
         uint256 newPerpAmount = k/(poolUSDC + _amountUSDC);
         uint256 perpTraded = poolVPerp - newPerpAmount;
+        
+        tradedVolume += _amountUSDC;
 
         poolUSDC += _amountUSDC;
         poolVPerp -= perpTraded;
@@ -71,6 +98,8 @@ contract PerpVPool{
         uint256 k = poolUSDC * poolVPerp;
         uint256 newPerpAmount = k/(poolUSDC - _amountUSDC);
         uint256 perpTraded = newPerpAmount - poolVPerp;
+
+        tradedVolume += _amountUSDC;
 
         poolUSDC -= _amountUSDC;
         poolVPerp += perpTraded;
@@ -94,6 +123,8 @@ contract PerpVPool{
         ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), newUSDCAmount - poolUSDC);
         
         uint256 tradedPrice = (newUSDCAmount - poolUSDC)/_amountVPerp;
+        
+        tradedVolume += (newUSDCAmount - poolUSDC);
 
         poolUSDC = newUSDCAmount;
         poolVPerp = newPerpAmount;
@@ -115,6 +146,8 @@ contract PerpVPool{
 
         uint256 tradedPrice = (poolUSDC - newUSDCAmount)/_amountVPerp;
 
+        tradedVolume += (poolUSDC - newUSDCAmount);
+
         poolUSDC = newUSDCAmount;
         poolVPerp = newPerpAmount;
         price = poolUSDC/poolVPerp;
@@ -124,5 +157,9 @@ contract PerpVPool{
         emit TradedVPerp(tradedPrice, int256(_amountVPerp));
 
         return (tradedPrice, _amountVPerp);
+    }
+
+    function getPosition(address _user) public view returns (LPPosition memory) {
+        return positions[_user];
     }
 }
