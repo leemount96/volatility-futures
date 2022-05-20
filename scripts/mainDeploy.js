@@ -10,10 +10,12 @@ async function main() {
   console.log("USDC deployed to:", usdc.address);
 
   const METAMASK_PUBKEY = "0x510B1130057b44A7Af60c3CF257528821eB2465C";
-  const METAMASK_PUBKEY_2 = "0x3DF61217233b4b56026B3F832E4015d5298A8489";
+  const METAMASK_PUBKEY_2 = "0x61c154B0389E03EDAE576479e3D51793dDc03c25";
+  const METAMASK_PUBKEY_3 = "0x3DF61217233b4b56026B3F832E4015d5298A8489";
+  
   const SQUEETH_ROPSTEN_ADDRESS = "0x59f0c781a6ec387f09c40faa22b7477a2950d209";
 
-  const initEVIXLevel = 100;
+  const initEVIXLevel = 160;
 
   const Oracle = await hre.ethers.getContractFactory("Oracle");
   const oracle = await Oracle.deploy(initEVIXLevel, SQUEETH_ROPSTEN_ADDRESS);
@@ -57,6 +59,10 @@ async function main() {
 
   console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_2);
 
+  await usdc.transfer(METAMASK_PUBKEY_3, 1000000);
+
+  console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_2);
+
   const [owner] = await hre.ethers.getSigners();
 
   const txHash = await owner.sendTransaction({
@@ -72,6 +78,13 @@ async function main() {
   });
 
   console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY_2);
+
+  const txHash_3 = await owner.sendTransaction({
+    to: METAMASK_PUBKEY_3,
+    value: ethers.utils.parseEther("1.0"),
+  });
+
+  console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY_3);
 }
 
 main().catch((error) => {

@@ -8,6 +8,7 @@ export const WhitepaperComponent = () => {
       <Document file={require("../assets/Volatility_Futures_White_Paper.pdf")}>
         <Page pageNumber={1} />
         <Page pageNumber={2} />
+        <Page pageNumber={3} />
       </Document>
     </div>
   );

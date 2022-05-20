@@ -13,8 +13,13 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
+let provider;
+let signer; 
+
+if(window.ethereum){
+provider = new ethers.providers.Web3Provider(window.ethereum);
+signer = provider.getSigner();
+}
 
 const MARGINPOOL_ADDRESS = process.env.REACT_APP_MARGINPOOL_ADDRESS!;
 const marginpoolAbi = marginpoolJson.abi;

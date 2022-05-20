@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 
 import { Button, Card } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { render } from "@testing-library/react";
 
 export const WalletInfo = ({}) => {
   const [data, setdata] = useState({
@@ -46,7 +47,7 @@ export const WalletInfo = ({}) => {
     getBalance(account);
   };
 
-  let content;
+  let content; 
 
   if (data.connected) {
     content = (

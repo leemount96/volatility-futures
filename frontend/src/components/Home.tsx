@@ -11,7 +11,10 @@ import {
   FormControl,
 } from "react-bootstrap";
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+let provider;
+if(window.ethereum){
+provider = new ethers.providers.Web3Provider(window.ethereum);
+}
 
 const USDC_ADDRESS = process.env.REACT_APP_USDC_ADDRESS!;
 const usdcAbi = usdcJson.abi;

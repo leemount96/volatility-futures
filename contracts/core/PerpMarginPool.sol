@@ -106,7 +106,7 @@ contract PerpMarginPool {
 
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(uint256(positions[msg.sender].amountVPerp));
 
-        freeCollateralMap[msg.sender] += uint256(int256(amountVPerp * (avgPrice-positions[msg.sender].tradedPrice)) + positions[msg.sender].fundingPNL) + positions[msg.sender].collateralAmount;
+        freeCollateralMap[msg.sender] += uint256(int256(amountVPerp * (avgPrice-positions[msg.sender].tradedPrice)) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount));
         
         positions[msg.sender] = Position(0, 0, 0, 0);
         liquidationRisk[msg.sender] = false;
