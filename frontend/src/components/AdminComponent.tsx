@@ -86,11 +86,11 @@ export const AdminComponent = () => {
       <ListGroup className="list-group-flush">
         <ListGroupItem>
           Current EVIX Pool Price:
-          {EVIXPoolPrice}
+          {" "}{EVIXPoolPrice}
         </ListGroupItem>
         <ListGroupItem>
           Current EVIX Index Mark:
-          {EVIXOraclePrice}
+          {" "}{EVIXOraclePrice}
         </ListGroupItem>
         <Card.Body>
           Update EVIX Via Squeeth
@@ -137,11 +137,11 @@ export const AdminComponent = () => {
       <ListGroup className="list-group-flush">
         <ListGroupItem>
           Current EVIX Pool Price:
-          {EVIXPoolPrice}
+          {" "}{EVIXPoolPrice}
         </ListGroupItem>
         <ListGroupItem>
           Current EVIX Index Mark:
-          {EVIXOraclePrice}
+          {" "}{EVIXOraclePrice}
         </ListGroupItem>
       </ListGroup>
       <Card.Body>

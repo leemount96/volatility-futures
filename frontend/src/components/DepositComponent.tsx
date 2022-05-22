@@ -93,7 +93,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Withdrawable Collateral:
-            {collateralAmount.amount}
+            {" "}{collateralAmount.amount}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -112,7 +112,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {walletUSDC.amount}
+            {" "}{walletUSDC.amount}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -140,7 +140,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {walletUSDC.amount}
+            {" "}{walletUSDC.amount}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>

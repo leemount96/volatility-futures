@@ -174,23 +174,23 @@ const TradeWindowComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Current Collateral:
-            {collateralAmount.amount}
+            {" "}{collateralAmount.amount}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
-            {EVIXPoolPrice}
+            {" "}{EVIXPoolPrice}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {EVIXOraclePrice}
+            {" "}{EVIXOraclePrice}
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "}
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "}
           </ListGroupItem>
           <ListGroupItem>
             Position Size: {tradePosition.EVIXAmount.toString()}
@@ -221,23 +221,23 @@ const TradeWindowComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available Collateral:
-            {collateralAmount.amount}
+            {" "}{collateralAmount.amount}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
-            {EVIXPoolPrice}
+            {" "}{EVIXPoolPrice}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {EVIXOraclePrice}
+            {" "}{EVIXOraclePrice}
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "}
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "}
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
