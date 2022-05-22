@@ -32,7 +32,7 @@ async function main() {
   const VPoolStartPrice = await oracle.spotEVIXLevel();
 
   const PerpVPool = await hre.ethers.getContractFactory("PerpVPool");
-  const perpVPool = await PerpVPool.deploy(VPoolStartPrice, usdc.address);
+  const perpVPool = await PerpVPool.deploy(VPoolStartPrice - 2, usdc.address);
 
   await perpVPool.deployed();
 

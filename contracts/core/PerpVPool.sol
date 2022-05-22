@@ -107,7 +107,7 @@ contract PerpVPool{
 
         ERC20(tUSDCAddress).transfer(msg.sender, _amountUSDC);
 
-        emit TradedVPerp(_amountUSDC/perpTraded, int256(perpTraded));
+        emit TradedVPerp(_amountUSDC/perpTraded + 1, int256(perpTraded));
 
         return (_amountUSDC/perpTraded, perpTraded);
     }
