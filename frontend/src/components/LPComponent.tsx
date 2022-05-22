@@ -41,6 +41,7 @@ const marginpool = new ethers.Contract(
 export const LPComponent = () => {
   const [EVIXOraclePrice, updateEVIXOraclePrice] = useState();
   const [EVIXPoolPrice, updateEVIXPoolPrice] = useState();
+  const [FeeRate, updateFeeRate] = useState();
   const [PoolState, updatePoolState] = useState({
     amountUSDC: 0,
     amountEVIX: 0,
@@ -68,6 +69,11 @@ export const LPComponent = () => {
   const GetEVIXPoolPrice = async () => {
     let val = await vpool.functions.price();
     updateEVIXPoolPrice(val.toString());
+  };
+
+  const GetFeeRate = async () => {
+    let val = await vpool.functions.feePercentage();
+    updateFeeRate(val.toString());
   };
 
   const GetConnectedWalletAddress = async () => {
@@ -129,6 +135,7 @@ export const LPComponent = () => {
   GetEVIXPoolPrice();
   GetPoolState();
   GetLPState();
+  GetFeeRate();
 
   let lpCard;
 
@@ -147,6 +154,10 @@ export const LPComponent = () => {
           <ListGroupItem>
             Current EVIX Index Mark:
             {EVIXOraclePrice}
+          </ListGroupItem>
+          <ListGroupItem>
+            Current Pool Fee Rate:
+            {FeeRate}%
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
@@ -188,6 +199,10 @@ export const LPComponent = () => {
           <ListGroupItem>
             Current EVIX Index Mark:
             {EVIXOraclePrice}
+          </ListGroupItem>
+          <ListGroupItem>
+            Current Pool Fee Rate:
+            {FeeRate}%
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:

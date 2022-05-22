@@ -24,17 +24,24 @@ async function main() {
 
   console.log("Oracle deployed to:", oracle.address);
 
+  let currentNormalization = ethers.BigNumber.from("661952215156645403");
+  let expectedNormalization = ethers.BigNumber.from("662387433446515165");
+
+  await oracle.updateSpotFromSqueeth(currentNormalization, expectedNormalization);
+
+  const VPoolStartPrice = await oracle.spotEVIXLevel();
+
   const PerpVPool = await hre.ethers.getContractFactory("PerpVPool");
-  const perpVPool = await PerpVPool.deploy(initEVIXLevel, usdc.address);
+  const perpVPool = await PerpVPool.deploy(VPoolStartPrice, usdc.address);
 
   await perpVPool.deployed();
 
   console.log("PerpVPool deployed to:", perpVPool.address);
 
-  const initMarginLevel = 5;
-  const lowRiskMargin = 4;
-  const highRiskMargin = 3;
-  const liquidationLevel = 2;
+  const initMarginLevel = 50;
+  const lowRiskMargin = 40;
+  const highRiskMargin = 30;
+  const liquidationLevel = 20;
 
   const PerpMarginPool = await hre.ethers.getContractFactory("PerpMarginPool");
   const perpMarginPool = await PerpMarginPool.deploy(
@@ -61,7 +68,7 @@ async function main() {
 
   await usdc.transfer(METAMASK_PUBKEY_3, 1000000);
 
-  console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_2);
+  console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_3);
 
   const [owner] = await hre.ethers.getSigners();
 

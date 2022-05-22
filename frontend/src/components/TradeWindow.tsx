@@ -106,8 +106,7 @@ const TradeWindowComponent = () => {
   const submitBuyLong = async (event: any) => {
     event.preventDefault();
     let tradeAmount = parseInt(event.target.tradeAmount.value);
-    let USDCAmount = tradeAmount * parseInt(EVIXPoolPrice!);
-    await marginpool.functions.openLongPosition(USDCAmount);
+    await marginpool.functions.openLongPosition(tradeAmount);
     let position = await marginpool.functions.positions(connectedAddress);
 
     updatePosition({
@@ -123,8 +122,7 @@ const TradeWindowComponent = () => {
   const submitSellShort = async (event: any) => {
     event.preventDefault();
     let tradeAmount = parseInt(event.target.tradeAmount.value);
-    let USDCAmount = tradeAmount * parseInt(EVIXPoolPrice!);
-    await marginpool.functions.openShortPosition(USDCAmount);
+    await marginpool.functions.openShortPosition(tradeAmount);
     let position = await marginpool.functions.positions(connectedAddress);
     
     updatePosition({
@@ -248,7 +246,7 @@ const TradeWindowComponent = () => {
             <input
               id="tradeAmount"
               type="text"
-              placeholder="Amount of EVIX"
+              placeholder="Amount of USDC"
             />
             <Button type={"submit"}>
               Buy
@@ -260,7 +258,7 @@ const TradeWindowComponent = () => {
             <input
               id="tradeAmount"
               type="text"
-              placeholder="Amount of EVIX"
+              placeholder="Amount of USDC"
             />
             <Button type={"submit"} variant="danger">
               Sell

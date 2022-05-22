@@ -25,20 +25,24 @@ contract Oracle {
         spotEVIXLevel = _newSpotLevel;
     }
 
-    function updateSpotFromSqueeth() public{
+    function updateSpotFromSqueeth(uint128 _currentNormalization, uint256 _expectedNormalization) public{
         // int256 expectedNormalization = int256(ISqueethController(squeethAddress).getExpectedNormalizationFactor());
         // int128 currentNormalization = int128(ISqueethController(squeethAddress).normalizationFactor());
 
-        int256 expectedNormalization = 667470490629307856;
-        int128 currentNormalization = 668359241497821737;
+        int256 expectedNormalization = int256(_expectedNormalization);
+        int128 currentNormalization = int128(_currentNormalization);
 
         int128 expectedNormalization128 = ABDKMath64x64.fromInt(expectedNormalization);
         currentNormalization = ABDKMath64x64.fromInt(currentNormalization);
         int128 timeFactor = ABDKMath64x64.fromInt(4566962103755937000);
 
-        int128 fundingRate = ABDKMath64x64.div(currentNormalization - expectedNormalization128, currentNormalization);
+        int128 fundingRate = abs(ABDKMath64x64.div(currentNormalization - expectedNormalization128, currentNormalization));
         int128 IV = ABDKMath64x64.mul(ABDKMath64x64.sqrt(fundingRate), timeFactor);
 
         spotEVIXLevel = uint256(ABDKMath64x64.toUInt(IV))/10**15;
+    }
+
+    function abs(int128 x) private pure returns (int128) {
+        return x>=0 ? x : -x;
     }
 }

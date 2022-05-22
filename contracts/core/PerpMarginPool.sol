@@ -78,25 +78,25 @@ contract PerpMarginPool {
     //Create a long position for user
     // for now, require that they can only have one open position at a time
     function openLongPosition(uint256 _amountVPerpUSDC) public {
-        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC, "Not enough collateral");
+        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC/100, "Not enough collateral");
         require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
-        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
+        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC/100;
         ERC20(USDCAddress).approve(address(perpVPool), _amountVPerpUSDC);
 
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.buy(_amountVPerpUSDC);
-        positions[msg.sender] = Position(int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC);
+        positions[msg.sender] = Position(int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC/100);
         liquidationRisk[msg.sender] = false;
     }
-    
+
     //Create short position for user
     function openShortPosition(uint256 _amountVPerpUSDC) public {
-        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC, "Not enough collateral");
+        require(freeCollateralMap[msg.sender] >= marginInit * _amountVPerpUSDC/100, "Not enough collateral");
         require(positions[msg.sender].amountVPerp == 0, "Already have open position");
 
-        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC;
+        freeCollateralMap[msg.sender] -= marginInit * _amountVPerpUSDC/100;
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sell(_amountVPerpUSDC);
-        positions[msg.sender] = Position(-1*int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC);
+        positions[msg.sender] = Position(-1*int256(amountVPerp), 0, avgPrice, marginInit * _amountVPerpUSDC/100);
         liquidationRisk[msg.sender] = false;
     }
 
@@ -105,8 +105,14 @@ contract PerpMarginPool {
         require(positions[msg.sender].amountVPerp > 0, "Don't have a long position");
 
         (uint256 avgPrice, uint256 amountVPerp) = perpVPool.sellAmountVPerp(uint256(positions[msg.sender].amountVPerp));
-
-        freeCollateralMap[msg.sender] += uint256(int256(amountVPerp * (avgPrice-positions[msg.sender].tradedPrice)) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount));
+        int256 netPNL = int256(amountVPerp) * (int256(avgPrice)-int256(positions[msg.sender].tradedPrice)) + positions[msg.sender].fundingPNL + int256(positions[msg.sender].collateralAmount);
+        if(netPNL >= 0){
+            freeCollateralMap[msg.sender] += uint256(netPNL);
+        } else {
+            netPNL *= -1;
+            freeCollateralMap[msg.sender] -= uint256(netPNL);
+        }
+        
         
         positions[msg.sender] = Position(0, 0, 0, 0);
         liquidationRisk[msg.sender] = false;
@@ -116,8 +122,16 @@ contract PerpMarginPool {
     function closeShortPosition() public {
         require(positions[msg.sender].amountVPerp < 0, "Don't have a short position");
 
-        (uint256 avgPrice,) = perpVPool.buyAmountVPerp(uint256(positions[msg.sender].amountVPerp));
-        freeCollateralMap[msg.sender] += uint256(positions[msg.sender].amountVPerp * int256(positions[msg.sender].tradedPrice-avgPrice) + positions[msg.sender].fundingPNL+ int256(positions[msg.sender].collateralAmount));
+        ERC20(USDCAddress).approve(address(perpVPool), positions[msg.sender].collateralAmount * 10);
+        (uint256 avgPrice,) = perpVPool.buyAmountVPerp(uint256(positions[msg.sender].amountVPerp * -1));
+        int256 netPNL = positions[msg.sender].amountVPerp * int256(positions[msg.sender].tradedPrice)-int256(avgPrice) + positions[msg.sender].fundingPNL+ int256(positions[msg.sender].collateralAmount);
+        
+        if(netPNL >= 0){
+            freeCollateralMap[msg.sender] += uint256(netPNL);
+        } else {
+            netPNL *= -1;
+            freeCollateralMap[msg.sender] -= uint256(netPNL);
+        }
         
         positions[msg.sender] = Position(0, 0, 0, 0);
         liquidationRisk[msg.sender] = false;

@@ -119,7 +119,7 @@ contract PerpVPool{
         uint256 k = poolUSDC * poolVPerp;
         uint256 newPerpAmount = poolVPerp - _amountVPerp;
         uint256 newUSDCAmount = k / newPerpAmount;
-
+        
         ERC20(tUSDCAddress).transferFrom(msg.sender, address(this), newUSDCAmount - poolUSDC);
         
         uint256 tradedPrice = (newUSDCAmount - poolUSDC)/_amountVPerp;

@@ -10,15 +10,15 @@ import {
   ListGroup,
   ListGroupItem,
   InputGroup,
-  CardGroup
+  CardGroup,
 } from "react-bootstrap";
 
 let provider;
-let signer; 
+let signer;
 
-if(window.ethereum){
-provider = new ethers.providers.Web3Provider(window.ethereum);
-signer = provider.getSigner();
+if (window.ethereum) {
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  signer = provider.getSigner();
 }
 
 const ORACLE_ADDRESS = process.env.REACT_APP_ORACLE_ADDRESS!;
@@ -58,8 +58,13 @@ export const AdminComponent = () => {
     await GetEVIXIndexMark();
   };
 
-  const TriggerSqueethPriceUpdate = async () => {
-    await oracle.functions.updateSpotFromSqueeth();
+  const TriggerSqueethPriceUpdate = async (event: any) => {
+    // event.preventDefault();
+    // let curNorm = ethers.BigNumber.from(event.target.curNorm.value);
+    // let expNorm = ethers.BigNumber.from(event.target.expNorm.value);
+    let curNorm = ethers.BigNumber.from("661952215156645403")
+    let expNorm = ethers.BigNumber.from("662357433446515165");
+    await oracle.functions.updateSpotFromSqueeth(curNorm, expNorm);
     await GetEVIXIndexMark();
   };
 
@@ -67,8 +72,8 @@ export const AdminComponent = () => {
     event.preventDefault();
     let address = event.target.address.value;
     await marginpool.functions._settleFunding(address);
-  }
-  
+  };
+
   GetEVIXIndexMark();
   GetEVIXPoolPrice();
 
@@ -87,22 +92,36 @@ export const AdminComponent = () => {
           Current EVIX Index Mark:
           {EVIXOraclePrice}
         </ListGroupItem>
-        <ListGroupItem>
-          <Button onClick={TriggerSqueethPriceUpdate}>
-            Update via Squeeth
-          </Button>
-        </ListGroupItem>
+        <Card.Body>
+          Update EVIX Via Squeeth
+          <InputGroup className="mb-3">
+            {/* <form onSubmit={TriggerSqueethPriceUpdate}>
+              <input
+                id="curNorm"
+                type="text"
+                placeholder="Normalization Factor"
+              />
+              <input
+                id="expNorm"
+                type="text"
+                placeholder="Expected Normalization"
+              />
+              <Button type={"submit"}>Update EVIX</Button>
+            </form> */}
+            <Button onClick={TriggerSqueethPriceUpdate}>Trigger Update</Button>
+          </InputGroup>
+        </Card.Body>
       </ListGroup>
       <Card.Body>
-        Provide Liquidity
+        Update EVIX Manually:
         <InputGroup className="mb-3">
           <form onSubmit={ManualUpdateOraclePrice}>
             <input
               id="newPrice"
               type="text"
-              placeholder="Price to set Oracle to"
+              placeholder="Level to set EVIX to"
             />
-            <Button type={"submit"}>Update Price</Button>
+            <Button type={"submit"}>Update EVIX</Button>
           </form>
         </InputGroup>
       </Card.Body>
@@ -129,11 +148,7 @@ export const AdminComponent = () => {
         Settle Address Funding
         <InputGroup className="mb-3">
           <form onSubmit={SettleAddressFunding}>
-            <input
-              id="address"
-              type="text"
-              placeholder="Address to settle"
-            />
+            <input id="address" type="text" placeholder="Address to settle" />
             <Button type={"submit"}>Settle Funding</Button>
           </form>
         </InputGroup>
@@ -142,9 +157,9 @@ export const AdminComponent = () => {
   );
 
   return (
-  <CardGroup>
-    {oracleCard}
-    {fundingCard}
-  </CardGroup>
-  )
+    <CardGroup>
+      {oracleCard}
+      {fundingCard}
+    </CardGroup>
+  );
 };
