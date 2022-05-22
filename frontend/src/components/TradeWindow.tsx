@@ -166,7 +166,7 @@ const TradeWindowComponent = () => {
 
   if (tradePosition.hasPosition) {
     tradeCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Trade EVIX</Card.Title>
           <Card.Text>Window for closing existing position</Card.Text>
@@ -174,7 +174,7 @@ const TradeWindowComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Current Collateral:
-            {" "}{collateralAmount.amount}
+            {" "}{collateralAmount.amount} USDC
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
@@ -186,20 +186,20 @@ const TradeWindowComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "} EVIX
           </ListGroupItem>
           <ListGroupItem>
-            Position Size: {tradePosition.EVIXAmount.toString()}
+            Position Size: {tradePosition.EVIXAmount.toString()} EVIX
           </ListGroupItem>
           <ListGroupItem>
-            Accrued Funding: {tradePosition.fundingPNL.toString()}
+            Accrued Funding: {tradePosition.fundingPNL.toString()} USDC
           </ListGroupItem>
           <ListGroupItem>
-            Opening Price: {tradePosition.openingPrice.toString()}
+            Opening Price: {tradePosition.openingPrice.toString()} USDC
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -211,33 +211,33 @@ const TradeWindowComponent = () => {
     );
   } else {
     tradeCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Trade EVIX</Card.Title>
           <Card.Text>
-            Window for viewing current EVIX stats and trading the perp
+            Window for trading EVIX Perpetual Swap
           </Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available Collateral:
-            {" "}{collateralAmount.amount}
+            {" "}{collateralAmount.amount} USDC
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
-            {" "}{EVIXPoolPrice}
+            {" "}{EVIXPoolPrice} 
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {" "}{EVIXOraclePrice}
+            {" "}{EVIXOraclePrice} 
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -249,7 +249,7 @@ const TradeWindowComponent = () => {
               placeholder="Amount of USDC"
             />
             <Button type={"submit"}>
-              Buy
+              Buy EVIX
             </Button>
           </form>
           </InputGroup>
@@ -261,7 +261,7 @@ const TradeWindowComponent = () => {
               placeholder="Amount of USDC"
             />
             <Button type={"submit"} variant="danger">
-              Sell
+              Sell EVIX
             </Button>
           </form>
           </InputGroup>

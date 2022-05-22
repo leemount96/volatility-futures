@@ -141,7 +141,7 @@ export const LPComponent = () => {
 
   if (lpPosition.hasPosition) {
     lpCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Remove EVIX Liquidity</Card.Title>
           <Card.Text>Window for removing liquidity in EVIX AMM Pool</Card.Text>
@@ -149,7 +149,7 @@ export const LPComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Current EVIX Pool Price:
-            {" "}{EVIXPoolPrice}
+            {" "}{EVIXPoolPrice} 
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
@@ -161,11 +161,11 @@ export const LPComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -182,7 +182,7 @@ export const LPComponent = () => {
     );
   } else {
     lpCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Provide EVIX Liquidity</Card.Title>
           <Card.Text>Window for providing liquidity in EVIX AMM Pool</Card.Text>
@@ -190,7 +190,7 @@ export const LPComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available Collateral:
-            {" "}{collateralAmount.amount}
+            {" "}{collateralAmount.amount} USDC
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
@@ -206,11 +206,11 @@ export const LPComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "}
+            {" "}{PoolState.amountUSDC}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "}
+            {" "}{PoolState.amountEVIX}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>

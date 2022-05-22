@@ -85,7 +85,7 @@ export const DepositComponent = () => {
 
   if (collateralAmount.amount > 0) {
     depositCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Manage Collateral</Card.Title>
           <Card.Text>Window for manging collateral in margin pool</Card.Text>
@@ -93,7 +93,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Withdrawable Collateral:
-            {" "}{collateralAmount.amount}
+            {" "}{collateralAmount.amount} USDC
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -112,7 +112,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {" "}{walletUSDC.amount}
+            {" "}{walletUSDC.amount} USDC
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -132,7 +132,7 @@ export const DepositComponent = () => {
     );
   } else {
     depositCard = (
-      <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Deposit Collateral</Card.Title>
           <Card.Text>Window for depositing USDC as collateral</Card.Text>
@@ -140,7 +140,7 @@ export const DepositComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {" "}{walletUSDC.amount}
+            {" "}{walletUSDC.amount} USDC
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
