@@ -14,11 +14,15 @@ import { Container } from "react-bootstrap";
 import { EVIXProvider } from "./components/contexts/EVIXContext";
 import { UserProvider } from "./components/contexts/UserContext";
 import { PoolProvider } from "./components/contexts/PoolContext";
+import { createClient, WagmiConfig } from 'wagmi';
+
+const client = createClient();
 
 function App() {
   return (
-      <EVIXProvider>
-        <PoolProvider>
+    <WagmiConfig client={client}>
+    <EVIXProvider>
+      <PoolProvider>
         <UserProvider>
           <BrowserRouter>
             <NavbarComponent />
@@ -37,8 +41,9 @@ function App() {
             </Container>
           </BrowserRouter>
         </UserProvider>
-        </PoolProvider>
-      </EVIXProvider>
+      </PoolProvider>
+    </EVIXProvider>
+    </WagmiConfig>
   );
 }
 

@@ -1,5 +1,7 @@
-import React, { ReactNode, FC, useState, useEffect } from "react";
-import { ethers } from "ethers";
+import React, { ReactNode, FC, useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useAccount, useConnect } from 'wagmi';
+import { InjectedConnector } from 'wagmi/connectors/injected'
+
 import { marginpool, usdc, vpool } from "../libs/ContractObjects";
 
 interface UserContextValue {
@@ -10,7 +12,7 @@ interface UserContextValue {
   depositedCollateral: number;
   tradePosition?: TradePosition;
   LPPosition?: LPPosition;
-  metamaskHandler?: () => void;
+  setWalletData?: Dispatch<SetStateAction<{ address: string; balance: string; connected: boolean; }>>;
 }
 
 interface TradePosition {
@@ -49,6 +51,11 @@ export const UserProvider: FC<props> = ({ children }) => {
     connected: false,
   });
 
+  const { data: account } = useAccount();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  })
+
   const [walletUSDC, updateWalletUSDC] = useState(0);
   const [userCollateral, updateCollateral] = useState(0);
   const [tradePosition, updateTradePosition] = useState<TradePosition>({
@@ -63,54 +70,19 @@ export const UserProvider: FC<props> = ({ children }) => {
     EVIXAmount: 0,
   })
 
-  const metamaskHandler = () => {
-    if (window.ethereum) {
-      window.ethereum
-        .request({ method: "eth_requestAccounts" })
-        .then((res: any) => accountChangeHandler(res[0]));
-    } else {
-      alert("Please install metamask extension");
-    }
-  };
-
-  const getBalance = (address: any) => {
-    window.ethereum
-      .request({
-        method: "eth_getBalance",
-        params: [address, "latest"],
-      })
-      .then((balance: any) => {
-        setWalletData({
-          address: address,
-          balance: ethers.utils.formatEther(balance),
-          connected: true,
-        });
-      });
-  };
-
-  const accountChangeHandler = (account: any) => {
-    // console.log(account);
-    setWalletData({
-      address: account,
-      balance: "",
-      connected: true,
-    });
-
-    getBalance(account);
-  };
-
   const getWalletUSDC = async () => {
-    let val = await usdc.functions.balanceOf(walletData.address);
+
+    let val = await usdc.functions.balanceOf(account!.address);
     updateWalletUSDC(parseInt(val.toString())/10**10);
   };
 
   const getCollateral = async () => {
-    let val = await marginpool.functions.freeCollateralMap(walletData.address);
+    let val = await marginpool.functions.freeCollateralMap(account!.address);
     updateCollateral(parseInt(val.toString())/10**10);
   };
 
   const getTradePosition = async () => {
-    let position = await marginpool.functions.positions(walletData.address);
+    let position = await marginpool.functions.positions(account!.address);
     if (position.amountVPerp.toNumber() !== 0) {
       updateTradePosition({
         hasTradePosition: true,
@@ -129,7 +101,7 @@ export const UserProvider: FC<props> = ({ children }) => {
   }
 
   const getLPPosition = async () => {
-    let LPPosition = await vpool.functions.getPosition(walletData.address);
+    let LPPosition = await vpool.functions.getPosition(account!.address);
     LPPosition = LPPosition[0];
     if (LPPosition.amountUSDC.toNumber() > 0){
       updateLPPosition({
@@ -147,16 +119,19 @@ export const UserProvider: FC<props> = ({ children }) => {
   }
 
   useEffect(() => {
+    // connect();
     const interval = setInterval(async () => {
       // console.log(walletData);
-      getWalletUSDC();
-      getCollateral();
-      getTradePosition();
-      getLPPosition();
+      await getWalletUSDC();
+      await getCollateral();
+      await getTradePosition();
+      await getLPPosition();
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  
 
   return (
     <UserContext.Provider
@@ -168,7 +143,7 @@ export const UserProvider: FC<props> = ({ children }) => {
         depositedCollateral: userCollateral,
         tradePosition: tradePosition,
         LPPosition: lpPosition,
-        metamaskHandler: metamaskHandler,
+        setWalletData: setWalletData,
       }}
     >
       {children}

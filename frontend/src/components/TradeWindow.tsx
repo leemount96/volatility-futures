@@ -94,35 +94,48 @@ const TradeWindowComponent = () => {
               {poolContext.amountEVIX.toLocaleString()} EVIX
             </Card.Text>
           </ListGroupItem>
-          <ListGroupItem>
-            Position Size:
-            <Card.Text className="DataField">
-              {userContext.tradePosition!.EVIXAmount.toLocaleString()} EVIX
-            </Card.Text>
-          </ListGroupItem>
-          <ListGroupItem>
-            Accrued Funding:
-            <Card.Text className="DataField">
-              {userContext.tradePosition!.fundingPNL.toLocaleString()} USDC
-            </Card.Text>
-          </ListGroupItem>
-          <ListGroupItem>
-            Opening Price:
-            <Card.Text className="DataField">
-              {userContext.tradePosition!.openingPrice.toLocaleString()} USDC
-            </Card.Text>
-          </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          {userContext.tradePosition!.EVIXAmount > 0 ? (
-            <Button variant="primary" onClick={submitCloseLong}>
-              Close Long Position
-            </Button>
-          ) : (
-            <Button variant="danger" onClick={submitCloseShort}>
-              Close Short Position
-            </Button>
-          )}
+          <p className="positionHeader" >Current Position:</p>
+          <ListGroup>
+            <ListGroupItem>
+              Position Size:
+              <Card.Text className="DataField">
+                {userContext.tradePosition!.EVIXAmount.toLocaleString()} EVIX
+              </Card.Text>
+            </ListGroupItem>
+            <ListGroupItem>
+              Accrued Funding:
+              <Card.Text className="DataField">
+                {userContext.tradePosition!.fundingPNL.toLocaleString()} USDC
+              </Card.Text>
+            </ListGroupItem>
+            <ListGroupItem>
+              Opening Price:
+              <Card.Text className="DataField">
+                {userContext.tradePosition!.openingPrice.toLocaleString()} USDC
+              </Card.Text>
+            </ListGroupItem>
+          </ListGroup>
+          <Card.Body>
+            {userContext.tradePosition!.EVIXAmount > 0 ? (
+              <Button
+                variant="primary"
+                className="DataField"
+                onClick={submitCloseLong}
+              >
+                Close Long Position
+              </Button>
+            ) : (
+              <Button
+                variant="danger"
+                className="DataField"
+                onClick={submitCloseShort}
+              >
+                Close Short Position
+              </Button>
+            )}
+          </Card.Body>
         </Card.Body>
       </Card>
     );
@@ -188,30 +201,22 @@ const TradeWindowComponent = () => {
             </Card.Text>
           </ListGroupItem>
         </ListGroup>
-          <Card.Body>
-            <form onSubmit={submitBuyLong}>
-              <input
-                id="tradeAmount"
-                type="text"
-                placeholder="Amount of USDC"
-              />
-              <Button className="DataField" type={"submit"}>
-                Buy EVIX
-              </Button>
-            </form>
-          </Card.Body>
-          <Card.Body>
-            <form onSubmit={submitSellShort}>
-              <input
-                id="tradeAmount"
-                type="text"
-                placeholder="Amount of USDC"
-              />
-              <Button className="DataField" type={"submit"} variant="danger">
-                Sell EVIX
-              </Button>
-            </form>
-          </Card.Body>
+        <Card.Body>
+          <form onSubmit={submitBuyLong}>
+            <input id="tradeAmount" type="text" placeholder="Amount of USDC" />
+            <Button className="DataField" type={"submit"}>
+              Buy EVIX
+            </Button>
+          </form>
+        </Card.Body>
+        <Card.Body>
+          <form onSubmit={submitSellShort}>
+            <input id="tradeAmount" type="text" placeholder="Amount of USDC" />
+            <Button className="DataField" type={"submit"} variant="danger">
+              Sell EVIX
+            </Button>
+          </form>
+        </Card.Body>
       </Card>
     );
   }

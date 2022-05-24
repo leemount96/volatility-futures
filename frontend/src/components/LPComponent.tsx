@@ -39,6 +39,13 @@ export const LPComponent = () => {
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
+            Available Collateral:
+            <Card.Text className="DataField">
+              {" "}
+              {userContext.depositedCollateral.toLocaleString()} USDC
+            </Card.Text>
+          </ListGroupItem>
+          <ListGroupItem>
             Current EVIX Index Mark:
             <Card.Text className="DataField">
               {" "}
@@ -52,10 +59,7 @@ export const LPComponent = () => {
               {evixContext.poolEVIXLevel.toLocaleString()}{" "}
             </Card.Text>
           </ListGroupItem>
-          <ListGroupItem>
-            Current Pool Fee Rate:
-            <Card.Text className="DataField"> {poolContext.feeRate}%</Card.Text>
-          </ListGroupItem>
+
           <ListGroupItem>
             USDC In Pool:
             <Card.Text className="DataField">
@@ -70,24 +74,37 @@ export const LPComponent = () => {
               {poolContext.amountEVIX.toLocaleString()} EVIX
             </Card.Text>
           </ListGroupItem>
+          <ListGroupItem>
+            Current Pool Fee Rate:
+            <Card.Text className="DataField"> {poolContext.feeRate}%</Card.Text>
+          </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          Current Position:
-          <Card.Body>
+          <p className="positionHeader">Current Position:</p>
+          <ListGroup>
+          <ListGroupItem>
             USDC:
             <Card.Text className="DataField">
-              {userContext.LPPosition!.USDCAmount.toLocaleString("en-US")}
+              {userContext.LPPosition!.USDCAmount.toLocaleString()}
             </Card.Text>
-          </Card.Body>
-          <Card.Body>
+          </ListGroupItem>
+          <ListGroupItem>
             EVIX:
             <Card.Text className="DataField">
               {userContext.LPPosition!.EVIXAmount.toLocaleString()}
             </Card.Text>
-          </Card.Body>
-          <Button variant="danger" onClick={removeLiquidityHandler}>
+          </ListGroupItem>
+
+          </ListGroup>
+          <Card.Body>
+          <Button
+            className="DataField"
+            variant="danger"
+            onClick={removeLiquidityHandler}
+          >
             Remove Liquidity
           </Button>
+          </Card.Body>
         </Card.Body>
       </Card>
     );
@@ -141,16 +158,16 @@ export const LPComponent = () => {
         </ListGroup>
         <Card.Body>
           Provide Liquidity
-          <InputGroup className="mb-3">
-            <form onSubmit={SendToLiquidityPool}>
-              <input
-                id="lpAmount"
-                type="text"
-                placeholder="Amount of USDC to LP"
-              />
-              <Button type={"submit"}>Send to LP</Button>
-            </form>
-          </InputGroup>
+          <form onSubmit={SendToLiquidityPool}>
+            <input
+              id="lpAmount"
+              type="text"
+              placeholder="Amount of USDC to LP"
+            />
+            <Button className="DataField" type={"submit"}>
+              Send to LP
+            </Button>
+          </form>
         </Card.Body>
       </Card>
     );

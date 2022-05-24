@@ -5,6 +5,7 @@ import { vpool, marginpool, usdc } from "./libs/ContractObjects";
 import { Card } from "react-bootstrap";
 
 import EVIXContext from "./contexts/EVIXContext";
+import "./ComponentStyling.css"
 
 
 export const HomeComponent = () => {
@@ -35,19 +36,19 @@ export const HomeComponent = () => {
     <Card style={{ width: "25rem" }} className="text-center me-5 mt-5">
       <Card.Body>
         <Card.Title>Total USDC Deposited</Card.Title>
-        <Card.Text className="text-center">
+        <Card.Text className="text-center HomePage">
           {depositedUSDC.amount.toLocaleString()} USDC
         </Card.Text>
       </Card.Body>
       <Card.Body>
         <Card.Title>Current EVIX Index Level</Card.Title>
-        <Card.Text className="text-center">
+        <Card.Text className="text-center HomePage">
           {evixContext.spotEVIXLevel.toLocaleString()}
         </Card.Text>
       </Card.Body>
       <Card.Body>
         <Card.Title>Current EVIX Pool Price</Card.Title>
-        <Card.Text className="text-center">
+        <Card.Text className="text-center HomePage">
           {evixContext.poolEVIXLevel.toLocaleString()}
         </Card.Text>
       </Card.Body>

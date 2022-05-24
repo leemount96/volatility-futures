@@ -2,3 +2,16 @@
     float: right;
     font-weight: bold;
 }
+
+.HomePage {
+    font-weight: bold;
+    font-size: larger;
+}
+
+.positionHeader {
+    font-weight: bold;
+}
+
+Card {
+    background: darkblue;
+}

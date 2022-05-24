@@ -49,8 +49,8 @@ contract PerpVPool{
     function removeLiquidity(address _user) public returns (uint256){ 
         uint256 k = poolUSDC * poolVPerp;
         uint256 positionK = positions[_user].amountUSDC * positions[_user].amountVPerp;
-        uint256 currentUSDC = poolUSDC * positionK / k;
-        uint256 currentVPerp = poolVPerp * positionK / k;
+        uint256 currentUSDC = poolUSDC * positionK / k * 2;
+        uint256 currentVPerp = poolVPerp * positionK / k * 2;
 
         // don't think this is necessary but wanted to go through the math
         // int256 perpValueChange = int256(positions[_user].amountVPerp * positions[_user].initPrice) - int256(currentVPerp * price);
@@ -70,7 +70,7 @@ contract PerpVPool{
     }
 
     function buy(uint256 _amountUSDC) public returns (uint256, uint256){
-        require(poolVPerp * (price) > _amountUSDC, "not enough liquidity");
+        // require(poolVPerp * (price) > _amountUSDC, "not enough liquidity");
         require(ERC20(tUSDCAddress).balanceOf(msg.sender) >= _amountUSDC, "not enough USDC in wallet");
 
         uint256 k = poolUSDC * poolVPerp;
@@ -135,7 +135,7 @@ contract PerpVPool{
     }
 
     function sellAmountVPerp(uint256 _amountVPerp) public returns (uint256, uint256) {
-        require(poolUSDC > _amountVPerp * price, "not enough liquidity");
+        // require(poolUSDC > _amountVPerp * price, "not enough liquidity");
 
         uint256 k = poolUSDC * poolVPerp;
         uint256 newPerpAmount = poolVPerp + _amountVPerp;
