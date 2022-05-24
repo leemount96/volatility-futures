@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { marginpool, usdc} from "./libs/ContractObjects";
 import UserContext from "./contexts/UserContext";
 

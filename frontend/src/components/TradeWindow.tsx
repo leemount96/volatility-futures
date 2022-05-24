@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import {oracle, vpool, marginpool} from "./libs/ContractObjects";
+import { vpool, marginpool} from "./libs/ContractObjects";
 import EVIXContext from "./contexts/EVIXContext";
 import UserContext from "./contexts/UserContext";
 
@@ -10,14 +10,9 @@ import {
   ListGroupItem,
   InputGroup,
 } from "react-bootstrap";
+import PoolContext from "./contexts/PoolContext";
 
 const TradeWindowComponent = () => {
-
-  const [PoolState, updatePoolState] = useState({
-    amountUSDC: 0,
-    amountEVIX: 0,
-  });
-
   const [InitialMargin, updateMargin] = useState(0);
 
   const GetMarginRate = async () => {
@@ -25,14 +20,6 @@ const TradeWindowComponent = () => {
     updateMargin(val/10**8);
   }
 
-  const GetPoolState = async () => {
-    let USDCAmount = await vpool.functions.poolUSDC();
-    let EVIXAmount = await vpool.functions.poolVPerp();
-    updatePoolState({
-      amountUSDC: parseInt(USDCAmount.toString()),
-      amountEVIX: parseInt(EVIXAmount.toString()),
-    });
-  };
 
   const submitBuyLong = async (event: any) => {
     event.preventDefault();
@@ -56,11 +43,11 @@ const TradeWindowComponent = () => {
     await marginpool.functions.closeShortPosition();
   }
 
-  GetPoolState();
   GetMarginRate();
 
   let evixContext = useContext(EVIXContext);
   let userContext = useContext(UserContext);
+  let poolContext = useContext(PoolContext);
 
   let tradeCard;
 
@@ -86,11 +73,11 @@ const TradeWindowComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{(PoolState.amountUSDC/10**10).toLocaleString()}{" "} USDC
+            {" "}{(poolContext.amountUSDC).toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{(PoolState.amountEVIX/10**8).toLocaleString()}{" "} EVIX
+            {" "}{(poolContext.amountEVIX).toLocaleString()}{" "} EVIX
           </ListGroupItem>
           <ListGroupItem>
             Position Size: {userContext.tradePosition!.EVIXAmount.toLocaleString()} EVIX
@@ -125,7 +112,7 @@ const TradeWindowComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             Current Initial Margin Rate:
-            {" "}{InitialMargin.toLocaleString()}%
+            {" "}{evixContext.initialMargin.toLocaleString()}%
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
@@ -137,14 +124,15 @@ const TradeWindowComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{(PoolState.amountUSDC/10**10).toLocaleString()}{" "} USDC
+            {" "}{(poolContext.amountUSDC).toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{(PoolState.amountEVIX/10**8).toLocaleString()}{" "} EVIX
+            {" "}{(poolContext.amountEVIX).toLocaleString()}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
+          Maximum Trade Size: {(userContext.depositedCollateral/(evixContext.initialMargin/100)).toLocaleString()}
           <InputGroup className="mb-3">
           <form onSubmit={submitBuyLong}>
             <input

@@ -13,10 +13,12 @@ import { AdminComponent } from "./components/AdminComponent";
 import { Container } from "react-bootstrap";
 import { EVIXProvider } from "./components/contexts/EVIXContext";
 import { UserProvider } from "./components/contexts/UserContext";
+import { PoolProvider } from "./components/contexts/PoolContext";
 
 function App() {
   return (
       <EVIXProvider>
+        <PoolProvider>
         <UserProvider>
           <BrowserRouter>
             <NavbarComponent />
@@ -35,6 +37,7 @@ function App() {
             </Container>
           </BrowserRouter>
         </UserProvider>
+        </PoolProvider>
       </EVIXProvider>
   );
 }

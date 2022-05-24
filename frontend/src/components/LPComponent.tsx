@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
-import { vpool, marginpool } from "./libs/ContractObjects";
+import React, { useContext } from "react";
+import { marginpool } from "./libs/ContractObjects";
 import EVIXContext from "./contexts/EVIXContext";
 import UserContext from "./contexts/UserContext";
+import PoolContext from "./contexts/PoolContext";
 
 import {
   Button,
@@ -13,26 +14,6 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export const LPComponent = () => {
-  const [FeeRate, updateFeeRate] = useState(0);
-  const [PoolState, updatePoolState] = useState({
-    amountUSDC: 0,
-    amountEVIX: 0,
-  });
-
-  const GetFeeRate = async () => {
-    let val = await vpool.functions.feePercentage();
-    updateFeeRate(val/(10**8));
-  };
-
-  const GetPoolState = async () => {
-    let USDCAmount = await vpool.functions.poolUSDC();
-    let EVIXAmount = await vpool.functions.poolVPerp();
-    updatePoolState({
-      amountUSDC: parseInt(USDCAmount.toString())/10**10,
-      amountEVIX: parseInt(EVIXAmount.toString())/10**8,
-    });
-  };
-
 
   const SendToLiquidityPool = async (event: any) => {
     event.preventDefault();
@@ -45,11 +26,9 @@ export const LPComponent = () => {
     await marginpool.functions.removeLiquidity();
   }
 
-  GetPoolState();
-  GetFeeRate();
-
   let evixContext = useContext(EVIXContext);
   let userContext = useContext(UserContext);
+  let poolContext = useContext(PoolContext);
 
   let lpCard;
 
@@ -71,15 +50,15 @@ export const LPComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             Current Pool Fee Rate:
-            {" "}{FeeRate}%
+            {" "}{poolContext.feeRate}%
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC.toLocaleString()}{" "} USDC
+            {" "}{poolContext.amountUSDC.toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX.toLocaleString()}{" "} EVIX
+            {" "}{poolContext.amountEVIX.toLocaleString()}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
@@ -116,15 +95,15 @@ export const LPComponent = () => {
           </ListGroupItem>
           <ListGroupItem>
             Current Pool Fee Rate:
-            0.{FeeRate}%
+            {" "}{poolContext.feeRate}%
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC.toLocaleString()}{" "} USDC
+            {" "}{poolContext.amountUSDC.toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX.toLocaleString()}{" "} EVIX
+            {" "}{poolContext.amountEVIX.toLocaleString()}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
