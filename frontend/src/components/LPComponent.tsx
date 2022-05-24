@@ -9,22 +9,21 @@ import {
   Card,
   ListGroup,
   ListGroupItem,
-  InputGroup, 
+  InputGroup,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export const LPComponent = () => {
-
   const SendToLiquidityPool = async (event: any) => {
     event.preventDefault();
-    let lpAmount = parseInt(event.target.lpAmount.value)*10**10;
+    let lpAmount = parseInt(event.target.lpAmount.value) * 10 ** 10;
     await marginpool.functions.provideLiquidity(lpAmount);
     event.target.reset();
   };
 
   const removeLiquidityHandler = async () => {
     await marginpool.functions.removeLiquidity();
-  }
+  };
 
   let evixContext = useContext(EVIXContext);
   let userContext = useContext(UserContext);
@@ -34,76 +33,110 @@ export const LPComponent = () => {
 
   if (userContext.LPPosition!.hasLPPosition) {
     lpCard = (
-      <Card style={{ width: "22rem" }} className="me-5 mt-5">
+      <Card style={{ width: "25rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Remove EVIX Liquidity</Card.Title>
-          <Card.Text>Window for removing liquidity in EVIX AMM Pool</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
-            Current EVIX Pool Price:
-            {" "}{evixContext.poolEVIXLevel.toLocaleString()} 
+            Current EVIX Index Mark:
+            <Card.Text className="DataField">
+              {" "}
+              {evixContext.spotEVIXLevel.toLocaleString()}
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
-            Current EVIX Index Mark:
-            {" "}{evixContext.spotEVIXLevel.toLocaleString()}
+            Current EVIX Pool Price:
+            <Card.Text className="DataField">
+              {" "}
+              {evixContext.poolEVIXLevel.toLocaleString()}{" "}
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             Current Pool Fee Rate:
-            {" "}{poolContext.feeRate}%
+            <Card.Text className="DataField"> {poolContext.feeRate}%</Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{poolContext.amountUSDC.toLocaleString()}{" "} USDC
+            <Card.Text className="DataField">
+              {" "}
+              {poolContext.amountUSDC.toLocaleString()} USDC
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{poolContext.amountEVIX.toLocaleString()}{" "} EVIX
+            <Card.Text className="DataField">
+              {" "}
+              {poolContext.amountEVIX.toLocaleString()} EVIX
+            </Card.Text>
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
           Current Position:
           <Card.Body>
-            USDC: {(userContext.LPPosition!.USDCAmount).toLocaleString("en-US")}
+            USDC:
+            <Card.Text className="DataField">
+              {userContext.LPPosition!.USDCAmount.toLocaleString("en-US")}
+            </Card.Text>
           </Card.Body>
           <Card.Body>
-            EVIX: {(userContext.LPPosition!.EVIXAmount).toLocaleString()}
+            EVIX:
+            <Card.Text className="DataField">
+              {userContext.LPPosition!.EVIXAmount.toLocaleString()}
+            </Card.Text>
           </Card.Body>
-          <Button variant="danger" onClick={removeLiquidityHandler}>Remove Liquidity</Button>
+          <Button variant="danger" onClick={removeLiquidityHandler}>
+            Remove Liquidity
+          </Button>
         </Card.Body>
       </Card>
     );
   } else {
     lpCard = (
-      <Card style={{ width: "22rem" }} className="me-5 mt-5">
+      <Card style={{ width: "25rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Provide EVIX Liquidity</Card.Title>
-          <Card.Text>Window for providing liquidity in EVIX AMM Pool</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available Collateral:
-            {" "}{userContext.depositedCollateral.toLocaleString()} USDC
-          </ListGroupItem>
-          <ListGroupItem>
-            Current EVIX Pool Price:
-            {" "}{evixContext.poolEVIXLevel.toLocaleString()}
+            <Card.Text className="DataField">
+              {" "}
+              {userContext.depositedCollateral.toLocaleString()} USDC
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {" "}{evixContext.spotEVIXLevel.toLocaleString()}
+            <Card.Text className="DataField">
+              {" "}
+              {evixContext.spotEVIXLevel.toLocaleString()}
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
+            Current EVIX Pool Price:
+            <Card.Text className="DataField">
+              {" "}
+              {evixContext.poolEVIXLevel.toLocaleString()}
+            </Card.Text>
+          </ListGroupItem>
+
+          <ListGroupItem>
             Current Pool Fee Rate:
-            {" "}{poolContext.feeRate}%
+            <Card.Text className="DataField"> {poolContext.feeRate}%</Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{poolContext.amountUSDC.toLocaleString()}{" "} USDC
+            <Card.Text className="DataField">
+              {" "}
+              {poolContext.amountUSDC.toLocaleString()} USDC
+            </Card.Text>
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{poolContext.amountEVIX.toLocaleString()}{" "} EVIX
+            <Card.Text className="DataField">
+              {" "}
+              {poolContext.amountEVIX.toLocaleString()} EVIX
+            </Card.Text>
           </ListGroupItem>
         </ListGroup>
         <Card.Body>

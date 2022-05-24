@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const maxSupply = ethers.BigNumber.from("100000000000000000");
+  const maxSupply = ethers.BigNumber.from("1000000000000000000000");
   const USDC = await hre.ethers.getContractFactory("USDCMock");
   const usdc = await USDC.deploy(maxSupply);
 

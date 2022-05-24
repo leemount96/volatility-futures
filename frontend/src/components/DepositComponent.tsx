@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { marginpool, usdc} from "./libs/ContractObjects";
 import UserContext from "./contexts/UserContext";
+import "./ComponentStyling.css";
 
 import {
   Button,
@@ -35,76 +36,68 @@ export const DepositComponent = () => {
 
   if (userContext.depositedCollateral > 0) {
     depositCard = (
-      <Card style={{ width: "22rem" }} className="me-5 mt-5">
+      <Card style={{ width: "25rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Manage Collateral</Card.Title>
-          <Card.Text>Window for manging collateral in margin pool</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Withdrawable Collateral:
-            {" "}{userContext.depositedCollateral.toLocaleString()} USDC
+            <Card.Text className="DataField">{" "}{userContext.depositedCollateral.toLocaleString()} USDC</Card.Text>
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
           Withdraw Collateral
-          <InputGroup className="mb-3">
             <form onSubmit={withdrawHandler}>
               <input
                 id="withdrawAmount"
                 type="text"
                 placeholder="Amount of USDC"
               />
-              <Button type={"submit"}>Withdraw </Button>
+              <Button className="DataField" type={"submit"}>Withdraw </Button>
             </form>
-          </InputGroup>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {" "}{userContext.USDCBalance.toLocaleString()} USDC
+            <Card.Text className="DataField">{" "}{userContext.USDCBalance.toLocaleString()} USDC</Card.Text>
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
           Deposit USDC
-          <InputGroup className="mb-3">
             <form onSubmit={depositHandler}>
               <input
                 id="depositAmount"
                 type="text"
                 placeholder="Amount of USDC"
               />
-              <Button type={"submit"}>Deposit </Button>
+              <Button className="DataField" type={"submit"}>Deposit </Button>
             </form>
-          </InputGroup>
         </Card.Body>
       </Card>
     );
   } else {
     depositCard = (
-      <Card style={{ width: "22rem" }} className="me-5 mt-5">
+      <Card style={{ width: "25rem" }} className="me-5 mt-5">
         <Card.Body>
           <Card.Title>Deposit Collateral</Card.Title>
-          <Card.Text>Window for depositing USDC as collateral</Card.Text>
         </Card.Body>
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available USDC Balance:
-            {" "}{userContext.USDCBalance.toLocaleString()} USDC
+            <Card.Text className="DataField">{" "}{userContext.USDCBalance.toLocaleString()} USDC</Card.Text>
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
           Deposit USDC
-          <InputGroup className="mb-3">
             <form onSubmit={depositHandler}>
               <input
                 id="depositAmount"
                 type="text"
                 placeholder="Amount of USDC"
               />
-              <Button type={"submit"}>Deposit </Button>
+              <Button className="DataField" type={"submit"}>Deposit </Button>
             </form>
-          </InputGroup>
         </Card.Body>
       </Card>
     );

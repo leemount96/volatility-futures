@@ -89,7 +89,7 @@ export const UserProvider: FC<props> = ({ children }) => {
   };
 
   const accountChangeHandler = (account: any) => {
-    console.log(account);
+    // console.log(account);
     setWalletData({
       address: account,
       balance: "",

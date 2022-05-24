@@ -9,4 +9,8 @@ contract USDCMock is ERC20 {
     constructor(uint256 initialSupply) ERC20("USDC Mock", "USDC") {
         _mint(msg.sender, initialSupply);
     }
+
+    function mintToUser(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
 }

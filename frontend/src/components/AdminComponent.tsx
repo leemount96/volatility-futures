@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { ethers } from "ethers";
-import {oracle, marginpool} from "./libs/ContractObjects";
+import { oracle, marginpool, usdc } from "./libs/ContractObjects";
 import EVIXContext from "./contexts/EVIXContext";
+import "./ComponentStyling.css";
 
 import {
   Button,
@@ -12,12 +13,10 @@ import {
   CardGroup,
 } from "react-bootstrap";
 
-
 export const AdminComponent = () => {
-
   const ManualUpdateOraclePrice = async (event: any) => {
     event.preventDefault();
-    let newPrice = parseInt(event.target.newPrice.value)*100;
+    let newPrice = parseInt(event.target.newPrice.value) * 100;
     await oracle.functions.manualUpdateSpotLevel(newPrice);
     event.target.reset();
   };
@@ -36,42 +35,52 @@ export const AdminComponent = () => {
     event.target.reset();
   };
 
+  const sendMockUSDC = async (event: any) => {
+    event.preventDefault();
+    let address = event.target.address.value;
+    let amount = parseInt(event.target.amount.value)*10**10;
+    await usdc.functions.mintToUser(address, amount);
+
+    event.target.reset();
+  }
+
   let evixContext = useContext(EVIXContext);
 
   let oracleCard = (
     <Card style={{ width: "18rem" }} className="me-5 mt-5">
       <Card.Body>
         <Card.Title>Update Oracle</Card.Title>
-        <Card.Text>Window for updating Oracle price level</Card.Text>
       </Card.Body>
       <ListGroup className="list-group-flush">
         <ListGroupItem>
           Current EVIX Pool Price:
-          {" "}{evixContext.poolEVIXLevel}
+          <Card.Text className="DataField">
+            {" "}
+            {evixContext.poolEVIXLevel}
+          </Card.Text>
         </ListGroupItem>
         <ListGroupItem>
           Current EVIX Index Mark:
-          {" "}{evixContext.spotEVIXLevel}
+          <Card.Text className="DataField">
+            {" "}
+            {evixContext.spotEVIXLevel}
+          </Card.Text>
         </ListGroupItem>
         <Card.Body>
           Update EVIX Via Squeeth
-          <InputGroup className="mb-3">
-            <Button onClick={TriggerSqueethPriceUpdate}>Trigger Update</Button>
-          </InputGroup>
+          <Button className="DataField" onClick={TriggerSqueethPriceUpdate}>
+            Trigger Update
+          </Button>
         </Card.Body>
       </ListGroup>
       <Card.Body>
         Update EVIX Manually:
-        <InputGroup className="mb-3">
-          <form onSubmit={ManualUpdateOraclePrice}>
-            <input
-              id="newPrice"
-              type="text"
-              placeholder="Level to set EVIX to"
-            />
-            <Button type={"submit"}>Update EVIX</Button>
-          </form>
-        </InputGroup>
+        <form onSubmit={ManualUpdateOraclePrice}>
+          <input id="newPrice" type="text" placeholder="Level to set EVIX to" />
+          <Button className="DataField" type={"submit"}>
+            Update EVIX
+          </Button>
+        </form>
       </Card.Body>
     </Card>
   );
@@ -84,21 +93,45 @@ export const AdminComponent = () => {
       <ListGroup className="list-group-flush">
         <ListGroupItem>
           Current EVIX Pool Price:
-          {" "}{evixContext.poolEVIXLevel}
+          <Card.Text className="DataField">
+            {" "}
+            {evixContext.poolEVIXLevel}
+          </Card.Text>
         </ListGroupItem>
         <ListGroupItem>
           Current EVIX Index Mark:
-          {" "}{evixContext.spotEVIXLevel}
+          <Card.Text className="DataField">
+            {" "}
+            {evixContext.spotEVIXLevel}
+          </Card.Text>
         </ListGroupItem>
       </ListGroup>
       <Card.Body>
         Settle Address Funding
-        <InputGroup className="mb-3">
-          <form onSubmit={SettleAddressFunding}>
-            <input id="address" type="text" placeholder="Address to settle" />
-            <Button type={"submit"}>Settle Funding</Button>
-          </form>
-        </InputGroup>
+        <form onSubmit={SettleAddressFunding}>
+          <input id="address" type="text" placeholder="Address to settle" />
+          <Button className="DataField" type={"submit"}>
+            Settle Funding
+          </Button>
+        </form>
+      </Card.Body>
+    </Card>
+  );
+
+  let mockUSDCCard = (
+    <Card style={{ width: "18rem" }} className="me-5 mt-5">
+      <Card.Body>
+        <Card.Title>Get Mock USDC</Card.Title>
+      </Card.Body>
+      <Card.Body>
+        Mint USDC to Address
+        <form onSubmit={sendMockUSDC}>
+          <input id="address" type="text" placeholder="Address" />
+          <input id="amount" type="text" placeholder="Amount" />
+          <Button className="DataField" type={"submit"}>
+            Send USDC
+          </Button>
+        </form>
       </Card.Body>
     </Card>
   );
@@ -107,6 +140,7 @@ export const AdminComponent = () => {
     <CardGroup>
       {oracleCard}
       {fundingCard}
+      {mockUSDCCard}
     </CardGroup>
   );
 };
