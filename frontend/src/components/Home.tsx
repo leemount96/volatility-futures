@@ -33,7 +33,7 @@ export const HomeComponent = () => {
   let evixContext = useContext(EVIXContext);
 
   return (
-    <Card style={{ width: "25rem" }} className="text-center me-5 mt-5">
+    <Card style={{ width: "25rem"}} className="text-center me-5 mt-5">
       <Card.Body>
         <Card.Title>Total USDC Deposited</Card.Title>
         <Card.Text className="text-center HomePage">

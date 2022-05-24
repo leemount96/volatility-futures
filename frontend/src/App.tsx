@@ -14,35 +14,35 @@ import { Container } from "react-bootstrap";
 import { EVIXProvider } from "./components/contexts/EVIXContext";
 import { UserProvider } from "./components/contexts/UserContext";
 import { PoolProvider } from "./components/contexts/PoolContext";
-import { createClient, WagmiConfig } from 'wagmi';
+import { createClient, WagmiConfig } from "wagmi";
 
 const client = createClient();
 
 function App() {
   return (
     <WagmiConfig client={client}>
-    <EVIXProvider>
-      <PoolProvider>
-        <UserProvider>
-          <BrowserRouter>
-            <NavbarComponent />
-            <Container>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/deposit" element={<DepositComponent />} />
-                <Route path="/trade" element={<TradeWindowComponent />} />
-                <Route path="/lp" element={<LPComponent />} />
-                <Route path="/risks" element={<RisksComponent />} />
-                <Route path="/strategies" element={<StrategiesComponent />} />
-                <Route path="/whitepaper" element={<WhitepaperComponent />} />
-                <Route path="/team" element={<TeamComponent />} />
-                <Route path="/admin" element={<AdminComponent />} />
-              </Routes>
-            </Container>
-          </BrowserRouter>
-        </UserProvider>
-      </PoolProvider>
-    </EVIXProvider>
+      <EVIXProvider>
+        <PoolProvider>
+          <UserProvider>
+            <BrowserRouter >
+              <NavbarComponent/>
+              <Container >
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/deposit" element={<DepositComponent />} />
+                  <Route path="/trade" element={<TradeWindowComponent />} />
+                  <Route path="/lp" element={<LPComponent />} />
+                  <Route path="/risks" element={<RisksComponent />} />
+                  <Route path="/strategies" element={<StrategiesComponent />} />
+                  <Route path="/whitepaper" element={<WhitepaperComponent />} />
+                  <Route path="/team" element={<TeamComponent />} />
+                  <Route path="/admin" element={<AdminComponent />} />
+                </Routes>
+              </Container>
+            </BrowserRouter>
+          </UserProvider>
+        </PoolProvider>
+      </EVIXProvider>
     </WagmiConfig>
   );
 }
