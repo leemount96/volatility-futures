@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const maxSupply = 100000000;
+  const maxSupply = ethers.BigNumber.from("100000000000000000");
   const USDC = await hre.ethers.getContractFactory("USDCMock");
   const usdc = await USDC.deploy(maxSupply);
 
@@ -15,7 +15,7 @@ async function main() {
   
   const SQUEETH_ROPSTEN_ADDRESS = "0x59f0c781a6ec387f09c40faa22b7477a2950d209";
 
-  const initEVIXLevel = 160;
+  const initEVIXLevel = 160*10**10;
 
   const Oracle = await hre.ethers.getContractFactory("Oracle");
   const oracle = await Oracle.deploy(initEVIXLevel, SQUEETH_ROPSTEN_ADDRESS);
@@ -30,18 +30,19 @@ async function main() {
   await oracle.updateSpotFromSqueeth(currentNormalization, expectedNormalization);
 
   const VPoolStartPrice = await oracle.spotEVIXLevel();
+  const feePercentage = 1*10**8;
 
   const PerpVPool = await hre.ethers.getContractFactory("PerpVPool");
-  const perpVPool = await PerpVPool.deploy(VPoolStartPrice - 2, usdc.address);
+  const perpVPool = await PerpVPool.deploy(VPoolStartPrice, usdc.address, feePercentage);
 
   await perpVPool.deployed();
 
   console.log("PerpVPool deployed to:", perpVPool.address);
 
-  const initMarginLevel = 50;
-  const lowRiskMargin = 40;
-  const highRiskMargin = 30;
-  const liquidationLevel = 20;
+  const initMarginLevel = 50*10**8;
+  const lowRiskMargin = 40*10**8;
+  const highRiskMargin = 30*10**8;
+  const liquidationLevel = 20*10**8;
 
   const PerpMarginPool = await hre.ethers.getContractFactory("PerpMarginPool");
   const perpMarginPool = await PerpMarginPool.deploy(
@@ -58,17 +59,17 @@ async function main() {
 
   console.log("Margin pool deployed to:", perpMarginPool.address);
 
-  await usdc.transfer(METAMASK_PUBKEY, 500000);
+  await usdc.transfer(METAMASK_PUBKEY, 500000*10**10);
 
   console.log("Transferred 500,000 mock USDC to: ", METAMASK_PUBKEY);
   
-  await usdc.transfer(METAMASK_PUBKEY_2, 1000000);
+  await usdc.transfer(METAMASK_PUBKEY_2, 500000*10**10);
 
-  console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_2);
+  console.log("Transferred 500,000 mock USDC to: ", METAMASK_PUBKEY_2);
 
-  await usdc.transfer(METAMASK_PUBKEY_3, 1000000);
+  await usdc.transfer(METAMASK_PUBKEY_3, 500000*10**10);
 
-  console.log("Transferred 1,000,000 mock USDC to: ", METAMASK_PUBKEY_3);
+  console.log("Transferred 500,000 mock USDC to: ", METAMASK_PUBKEY_3);
 
   const [owner] = await hre.ethers.getSigners();
 

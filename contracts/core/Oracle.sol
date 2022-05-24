@@ -39,7 +39,7 @@ contract Oracle {
         int128 fundingRate = abs(ABDKMath64x64.div(currentNormalization - expectedNormalization128, currentNormalization));
         int128 IV = ABDKMath64x64.mul(ABDKMath64x64.sqrt(fundingRate), timeFactor);
 
-        spotEVIXLevel = uint256(ABDKMath64x64.toUInt(IV))/10**15;
+        spotEVIXLevel = uint256(ABDKMath64x64.toUInt(IV))/10**13;
     }
 
     function abs(int128 x) private pure returns (int128) {

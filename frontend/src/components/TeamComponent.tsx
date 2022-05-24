@@ -1,6 +1,5 @@
 import React from "react";
 import "./Team.css";
-import { Card } from "react-bootstrap";
 
 import Lee from "../assets/Lee.jpeg";
 
@@ -20,27 +19,17 @@ export const TeamComponent = () => {
             </div>
             <ul className="list-unstyled team-social social-icon social mb-0">
               <li className="list-inline-item">
-                <a href="javascript:void(0)" className="rounded">
-                  <i className="mdi mdi-facebook" title="Facebook"></i>
-                </a>
-              </li>
-              <li className="list-inline-item">
-                <a href="javascript:void(0)" className="rounded">
-                  <i className="mdi mdi-instagram" title="Instagram"></i>
-                </a>
-              </li>
-              <li className="list-inline-item">
-                <a href="javascript:void(0)" className="rounded">
+                <a href="https://twitter.com/lmount_" target="_blank" rel="noreferrer" className="rounded">
                   <i className="mdi mdi-twitter" title="Twitter"></i>
                 </a>
               </li>
               <li className="list-inline-item">
-                <a href="javascript:void(0)" className="rounded">
+                <a href="https://github.com/leemount96" target="_blank" rel="noreferrer" className="rounded">
                   <i className="mdi mdi-github" title="Github"></i>
                 </a>
               </li>
               <li className="list-inline-item">
-                <a href="javascript:void(0)" className="rounded">
+                <a href="https://www.linkedin.com/in/lee-mount-843541a9/" rel="noreferrer" target="_blank" className="rounded">
                   <i className="mdi mdi-linkedin" title="Linkedin"></i>
                 </a>
               </li>

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { ethers } from "ethers";
-import oracleJson from "../abis/Oracle.json";
-import vpoolJson from "../abis/PerpVPool.json";
-import marginpoolJson from "../abis/PerpMarginPool.json";
+import React, { useState, useContext } from "react";
+import {oracle, vpool, marginpool} from "./libs/ContractObjects";
+import EVIXContext from "./contexts/EVIXContext";
+import UserContext from "./contexts/UserContext";
 
 import {
   Button,
@@ -11,75 +10,20 @@ import {
   ListGroupItem,
   InputGroup,
 } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-let provider;
-let signer;
-
-if(window.ethereum){
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  signer = provider.getSigner();
-}
-
-const ORACLE_ADDRESS = process.env.REACT_APP_ORACLE_ADDRESS!;
-const oracleAbi = oracleJson.abi;
-const oracle = new ethers.Contract(ORACLE_ADDRESS, oracleAbi, provider);
-
-const VPOOL_ADDRESS = process.env.REACT_APP_VPOOL_ADDRESS!;
-const vpoolAbi = vpoolJson.abi;
-const vpool = new ethers.Contract(VPOOL_ADDRESS, vpoolAbi, signer);
-
-const MARGINPOOL_ADDRESS = process.env.REACT_APP_MARGINPOOL_ADDRESS!;
-const marginpoolAbi = marginpoolJson.abi;
-const marginpool = new ethers.Contract(
-  MARGINPOOL_ADDRESS,
-  marginpoolAbi,
-  signer
-);
 
 const TradeWindowComponent = () => {
-  const [EVIXOraclePrice, updateEVIXOraclePrice] = useState();
-  const [EVIXPoolPrice, updateEVIXPoolPrice] = useState();
+
   const [PoolState, updatePoolState] = useState({
     amountUSDC: 0,
     amountEVIX: 0,
   });
 
-  const [connectedAddress, updateConnectedAddress] = useState({
-    address: "",
-  });
+  const [InitialMargin, updateMargin] = useState(0);
 
-  const [collateralAmount, updateCollateralAmount] = useState({
-    amount: 0,
-  });
-
-  const [tradePosition, updatePosition] = useState({
-    hasPosition: false,
-    EVIXAmount: 0,
-    fundingPNL: 0,
-    openingPrice: 0,
-  });
-
-  const GetEVIXIndexMark = async () => {
-    let val = await oracle.functions.spotEVIXLevel();
-    updateEVIXOraclePrice(val.toString());
-  };
-
-  const GetEVIXPoolPrice = async () => {
-    let val = await vpool.functions.price();
-    updateEVIXPoolPrice(val.toString());
-  };
-
-  const GetConnectedWalletAddress = async () => {
-    window.ethereum
-      .request({ method: "eth_requestAccounts" })
-      .then((res: any) => updateConnectedAddress(res[0]));
-  };
-
-  const GetCollateralAmount = async () => {
-    let val = await marginpool.functions.freeCollateralMap(connectedAddress);
-    updateCollateralAmount({ amount: parseInt(val.toString()) });
-  };
+  const GetMarginRate = async () => {
+    let val = await marginpool.functions.marginInit();
+    updateMargin(val/10**8);
+  }
 
   const GetPoolState = async () => {
     let USDCAmount = await vpool.functions.poolUSDC();
@@ -90,81 +34,37 @@ const TradeWindowComponent = () => {
     });
   };
 
-  const GetPositionState = async () => {
-    let position = await marginpool.functions.positions(connectedAddress);
-    if (position.amountVPerp.toNumber() !== 0){
-      updatePosition({
-        hasPosition: true,
-        EVIXAmount: position.amountVPerp.toNumber(),
-        fundingPNL: position.fundingPNL.toNumber(),
-        openingPrice: position.tradedPrice.toNumber(),
-      })
-    }
-  };
-
-
   const submitBuyLong = async (event: any) => {
     event.preventDefault();
-    let tradeAmount = parseInt(event.target.tradeAmount.value);
+    let tradeAmount = parseInt(event.target.tradeAmount.value)*10**10;
     await marginpool.functions.openLongPosition(tradeAmount);
-    let position = await marginpool.functions.positions(connectedAddress);
-
-    updatePosition({
-      hasPosition: true,
-      EVIXAmount: position.amountVPerp.toNumber(),
-      fundingPNL: 0,
-      openingPrice: position.tradedPrice.toNumber(),
-    })
-
-    await GetEVIXPoolPrice();
+    event.target.reset();
   };
 
   const submitSellShort = async (event: any) => {
     event.preventDefault();
-    let tradeAmount = parseInt(event.target.tradeAmount.value);
+    let tradeAmount = parseInt(event.target.tradeAmount.value)*10**10;
     await marginpool.functions.openShortPosition(tradeAmount);
-    let position = await marginpool.functions.positions(connectedAddress);
-    
-    updatePosition({
-      hasPosition: true,
-      EVIXAmount: position.amountVPerp.toNumber(),
-      fundingPNL: 0,
-      openingPrice: position.tradedPrice.toNumber(),
-    })
-
-    await GetEVIXPoolPrice();
+    event.target.reset();
   };
 
   const submitCloseLong = async () => {
     await marginpool.functions.closeLongPosition();
-    updatePosition({
-      hasPosition: false,
-      EVIXAmount: 0,
-      fundingPNL: 0,
-      openingPrice: 0
-    })
   }
 
   const submitCloseShort = async () => {
     await marginpool.functions.closeShortPosition();
-    updatePosition({
-      hasPosition: false,
-      EVIXAmount: 0,
-      fundingPNL: 0,
-      openingPrice: 0
-    })
   }
 
-  GetConnectedWalletAddress();
-  GetCollateralAmount();
-  GetEVIXIndexMark();
-  GetEVIXPoolPrice();
   GetPoolState();
-  GetPositionState();
+  GetMarginRate();
+
+  let evixContext = useContext(EVIXContext);
+  let userContext = useContext(UserContext);
 
   let tradeCard;
 
-  if (tradePosition.hasPosition) {
+  if (userContext.tradePosition!.hasTradePosition) {
     tradeCard = (
       <Card style={{ width: "22rem" }} className="me-5 mt-5">
         <Card.Body>
@@ -174,36 +74,36 @@ const TradeWindowComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Current Collateral:
-            {" "}{collateralAmount.amount} USDC
+            {" "}{userContext.depositedCollateral.toLocaleString()} USDC
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
-            {" "}{EVIXPoolPrice}
+            {" "}{evixContext.poolEVIXLevel.toLocaleString()}
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {" "}{EVIXOraclePrice}
+            {" "}{evixContext.spotEVIXLevel.toLocaleString()}
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "} USDC
+            {" "}{(PoolState.amountUSDC/10**10).toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "} EVIX
+            {" "}{(PoolState.amountEVIX/10**8).toLocaleString()}{" "} EVIX
           </ListGroupItem>
           <ListGroupItem>
-            Position Size: {tradePosition.EVIXAmount.toString()} EVIX
+            Position Size: {userContext.tradePosition!.EVIXAmount.toLocaleString()} EVIX
           </ListGroupItem>
           <ListGroupItem>
-            Accrued Funding: {tradePosition.fundingPNL.toString()} USDC
+            Accrued Funding: {userContext.tradePosition!.fundingPNL.toLocaleString()} USDC
           </ListGroupItem>
           <ListGroupItem>
-            Opening Price: {tradePosition.openingPrice.toString()} USDC
+            Opening Price: {userContext.tradePosition!.openingPrice.toLocaleString()} USDC
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          {tradePosition.EVIXAmount > 0
+          {userContext.tradePosition!.EVIXAmount > 0
           ? <Button variant="primary" onClick={submitCloseLong}>Close Long Position</Button>
           : <Button variant="danger" onClick={submitCloseShort}>Close Short Position</Button>}  
         </Card.Body>
@@ -221,23 +121,27 @@ const TradeWindowComponent = () => {
         <ListGroup className="list-group-flush">
           <ListGroupItem>
             Available Collateral:
-            {" "}{collateralAmount.amount} USDC
+            {" "}{userContext.depositedCollateral.toLocaleString()} USDC
+          </ListGroupItem>
+          <ListGroupItem>
+            Current Initial Margin Rate:
+            {" "}{InitialMargin.toLocaleString()}%
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Pool Price:
-            {" "}{EVIXPoolPrice} 
+            {" "}{evixContext.poolEVIXLevel.toLocaleString()} 
           </ListGroupItem>
           <ListGroupItem>
             Current EVIX Index Mark:
-            {" "}{EVIXOraclePrice} 
+            {" "}{evixContext.spotEVIXLevel.toLocaleString()} 
           </ListGroupItem>
           <ListGroupItem>
             USDC In Pool:
-            {" "}{PoolState.amountUSDC}{" "} USDC
+            {" "}{(PoolState.amountUSDC/10**10).toLocaleString()}{" "} USDC
           </ListGroupItem>
           <ListGroupItem>
             EVIX In Pool:
-            {" "}{PoolState.amountEVIX}{" "} EVIX
+            {" "}{(PoolState.amountEVIX/10**8).toLocaleString()}{" "} EVIX
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
