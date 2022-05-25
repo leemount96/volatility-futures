@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { ethers } from "ethers";
 import { marginpool, usdc} from "./libs/ContractObjects";
 import UserContext from "./contexts/UserContext";
 import "./ComponentStyling.css";
@@ -15,7 +16,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export const DepositComponent = () => {
   const depositHandler = async (event: any) => {
     event.preventDefault();
-    let depositAmount = parseInt(event.target.depositAmount.value)*10**10;
+    // let depositAmount = parseInt(event.target.depositAmount.value)*10**10;
+    let depositAmount = ethers.BigNumber.from(event.target.depositAmount.value).mul(ethers.BigNumber.from(10**10));
     const approval = await usdc.functions.approve(marginpool.address, depositAmount);
     await approval.wait();
     await marginpool.functions.depositCollateral(depositAmount);

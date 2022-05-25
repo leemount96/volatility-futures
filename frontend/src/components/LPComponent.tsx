@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { marginpool } from "./libs/ContractObjects";
+import { ethers } from "ethers";
 import EVIXContext from "./contexts/EVIXContext";
 import UserContext from "./contexts/UserContext";
 import PoolContext from "./contexts/PoolContext";
@@ -16,7 +17,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export const LPComponent = () => {
   const SendToLiquidityPool = async (event: any) => {
     event.preventDefault();
-    let lpAmount = parseInt(event.target.lpAmount.value) * 10 ** 10;
+    let lpAmount = ethers.BigNumber.from(event.target.lpAmount.value).mul(ethers.BigNumber.from(10**10));
     await marginpool.functions.provideLiquidity(lpAmount);
     event.target.reset();
   };

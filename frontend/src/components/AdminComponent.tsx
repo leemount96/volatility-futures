@@ -38,7 +38,7 @@ export const AdminComponent = () => {
   const sendMockUSDC = async (event: any) => {
     event.preventDefault();
     let address = event.target.address.value;
-    let amount = parseInt(event.target.amount.value)*10**10;
+    let amount = ethers.BigNumber.from(event.target.amount.value).mul(ethers.BigNumber.from(10**10));
     await usdc.functions.mintToUser(address, amount);
 
     event.target.reset();

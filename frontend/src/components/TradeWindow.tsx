@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { ethers } from "ethers";
 import { vpool, marginpool } from "./libs/ContractObjects";
 import EVIXContext from "./contexts/EVIXContext";
 import UserContext from "./contexts/UserContext";
@@ -23,14 +24,14 @@ const TradeWindowComponent = () => {
 
   const submitBuyLong = async (event: any) => {
     event.preventDefault();
-    let tradeAmount = parseInt(event.target.tradeAmount.value) * 10 ** 10;
+    let tradeAmount = ethers.BigNumber.from(event.target.tradeAmount.value).mul(ethers.BigNumber.from(10**10));
     await marginpool.functions.openLongPosition(tradeAmount);
     event.target.reset();
   };
 
   const submitSellShort = async (event: any) => {
     event.preventDefault();
-    let tradeAmount = parseInt(event.target.tradeAmount.value) * 10 ** 10;
+    let tradeAmount = ethers.BigNumber.from(event.target.tradeAmount.value).mul(ethers.BigNumber.from(10**10));
     await marginpool.functions.openShortPosition(tradeAmount);
     event.target.reset();
   };

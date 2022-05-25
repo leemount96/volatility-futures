@@ -86,8 +86,8 @@ export const UserProvider: FC<props> = ({ children }) => {
     if (position.amountVPerp.toNumber() !== 0) {
       updateTradePosition({
         hasTradePosition: true,
-        EVIXAmount: position.amountVPerp.toNumber()/10**8,
-        fundingPNL: position.fundingPNL.toNumber()/10**10,
+        EVIXAmount: position.amountVPerp.div(10**8).toNumber(),
+        fundingPNL: position.fundingPNL.div(10**10).toNumber(),
         openingPrice: position.tradedPrice.toNumber()/10**2,
       })
     } else {
@@ -103,11 +103,11 @@ export const UserProvider: FC<props> = ({ children }) => {
   const getLPPosition = async () => {
     let LPPosition = await vpool.functions.getPosition(account!.address);
     LPPosition = LPPosition[0];
-    if (LPPosition.amountUSDC.toNumber() > 0){
+    if (LPPosition.amountUSDC.gt(0)){
       updateLPPosition({
         hasLPPosition: true,
-        USDCAmount: LPPosition.amountUSDC.toNumber()/10**10,
-        EVIXAmount: LPPosition.amountVPerp.toNumber()/10**8,
+        USDCAmount: LPPosition.amountUSDC.div(10**10).toNumber(),
+        EVIXAmount: LPPosition.amountVPerp.div(10**8).toNumber(),
       })
     } else {
       updateLPPosition({
