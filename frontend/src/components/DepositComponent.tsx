@@ -16,7 +16,8 @@ export const DepositComponent = () => {
   const depositHandler = async (event: any) => {
     event.preventDefault();
     let depositAmount = parseInt(event.target.depositAmount.value)*10**10;
-    await usdc.functions.approve(marginpool.address, depositAmount);
+    const approval = await usdc.functions.approve(marginpool.address, depositAmount);
+    await approval.wait();
     await marginpool.functions.depositCollateral(depositAmount);
 
     event.target.reset();

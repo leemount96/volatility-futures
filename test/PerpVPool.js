@@ -14,11 +14,12 @@ describe("VPerp", function () {
   let addrs;
 
   let startingPrice = 10;
-  let maxSupplyUSDC = 100000;
+  let maxSupplyUSDC = ethers.BigNumber.from("1000000000000000000000");;
 
-  let addr1USDC = 10000;
-  let addr2USDC = 10000;
-  let addr3USDC = 10000;
+  let addr1USDC = 500000*10**10;
+  let addr2USDC = 500000*10**10;
+  let addr3USDC = 500000*10**10;
+  let feePercentage = 1*10**8;
 
   // runs before each test
   beforeEach(async function () {
@@ -28,7 +29,7 @@ describe("VPerp", function () {
 
     USDC = await ethers.getContractFactory("USDCMock");
     deployedUSDC = await USDC.deploy(maxSupplyUSDC);
-    deployedPool = await PerpVPool.deploy(startingPrice, deployedUSDC.address);
+    deployedPool = await PerpVPool.deploy(startingPrice, deployedUSDC.address, feePercentage);
 
     await deployedUSDC.transfer(addr1.address, addr1USDC);
     await deployedUSDC.connect(addr1).approve(deployedPool.address, addr1USDC);
@@ -167,7 +168,7 @@ describe("VPerp", function () {
 
       expect(await deployedPool.poolVPerp()).to.equal(200);
       expect(await deployedPool.price()).to.equal(2);
-      expect(parsedEvent.price).to.equal(5);
+      expect(parsedEvent.price).to.equal(6);
       expect(parsedEvent.amount).to.equal(100);
     });
 
@@ -186,7 +187,7 @@ describe("VPerp", function () {
 
       expect(await deployedPool.poolVPerp()).to.equal(250);
       expect(await deployedPool.price()).to.equal(1);
-      expect(parsedEvent.price).to.equal(2);
+      expect(parsedEvent.price).to.equal(3);
       expect(parsedEvent.amount).to.equal(50);
     });
   });
@@ -253,12 +254,20 @@ describe("VPerp", function () {
       expect(await deployedPool.poolVPerp()).to.equal(99); //rounding issue, should be 100
       expect(await deployedPool.price()).to.equal(10);
 
-      expect(parsedEvent.price).to.equal(15);
+      expect(parsedEvent.price).to.equal(16);
       expect(parsedEvent.amount).to.equal(33);
     });
   });
 
   describe("Positions - provide and remove liquidity", async function () {
-    beforeEach(async function () {});
+    beforeEach(async function () {
+      await deployedPool.connect(addr1).provideLiquidity(addr1.address, 100000*10**10);
+      await deployedPool.connect(addr2).provideLiquidity(addr2.address, 500000*10**10);
+    });
+
+    it("Try to remove liquidity", async function () {
+      var returnedUSDC = await deployedPool.connect(addr2).removeLiquidity(addr2.address);
+    })
   });
+
 });

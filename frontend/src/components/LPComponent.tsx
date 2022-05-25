@@ -80,7 +80,7 @@ export const LPComponent = () => {
           </ListGroupItem>
         </ListGroup>
         <Card.Body>
-          <p className="positionHeader">Current Position:</p>
+          <p className="positionHeader">Initial LP Position:</p>
           <ListGroup>
           <ListGroupItem>
             USDC:
