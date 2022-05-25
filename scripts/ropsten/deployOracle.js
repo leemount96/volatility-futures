@@ -20,6 +20,13 @@ async function main() {
   await oracle.deployed();
 
   console.log("Oracle deployed to:", oracle.address);
+
+  let currentNormalization = ethers.BigNumber.from("661952215156645403");
+  let expectedNormalization = ethers.BigNumber.from("662387433446515165");
+
+  await oracle.updateSpotFromSqueeth(currentNormalization, expectedNormalization);
+  let VPoolStartPrice = await oracle.spotEVIXLevel();
+  console.log("Starting level:", VPoolStartPrice);
 }
 
 main().catch((error) => {

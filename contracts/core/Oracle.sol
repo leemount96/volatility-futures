@@ -26,11 +26,11 @@ contract Oracle {
     }
 
     function updateSpotFromSqueeth(uint128 _currentNormalization, uint256 _expectedNormalization) public{
-        // int256 expectedNormalization = int256(ISqueethController(squeethAddress).getExpectedNormalizationFactor());
-        // int128 currentNormalization = int128(ISqueethController(squeethAddress).normalizationFactor());
+        int256 expectedNormalization = int256(ISqueethController(squeethAddress).getExpectedNormalizationFactor());
+        int128 currentNormalization = int128(ISqueethController(squeethAddress).normalizationFactor());
 
-        int256 expectedNormalization = int256(_expectedNormalization);
-        int128 currentNormalization = int128(_currentNormalization);
+        // int256 expectedNormalization = int256(_expectedNormalization);
+        // int128 currentNormalization = int128(_currentNormalization);
 
         int128 expectedNormalization128 = ABDKMath64x64.fromInt(expectedNormalization);
         currentNormalization = ABDKMath64x64.fromInt(currentNormalization);

@@ -24,11 +24,6 @@ async function main() {
 
   console.log("Oracle deployed to:", oracle.address);
 
-  let currentNormalization = ethers.BigNumber.from("661952215156645403");
-  let expectedNormalization = ethers.BigNumber.from("662387433446515165");
-
-  await oracle.updateSpotFromSqueeth(currentNormalization, expectedNormalization);
-
   const VPoolStartPrice = await oracle.spotEVIXLevel();
   const feePercentage = 1*10**8;
 
@@ -71,28 +66,6 @@ async function main() {
 
   console.log("Transferred 500,000 mock USDC to: ", METAMASK_PUBKEY_3);
 
-  const [owner] = await hre.ethers.getSigners();
-
-  const txHash = await owner.sendTransaction({
-    to: METAMASK_PUBKEY,
-    value: ethers.utils.parseEther("1.0"),
-  });
-
-  console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY);
-
-  const txHash_2 = await owner.sendTransaction({
-    to: METAMASK_PUBKEY_2,
-    value: ethers.utils.parseEther("1.0"),
-  });
-
-  console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY_2);
-
-  const txHash_3 = await owner.sendTransaction({
-    to: METAMASK_PUBKEY_3,
-    value: ethers.utils.parseEther("1.0"),
-  });
-
-  console.log("Transferred 1.0 ETH to:", METAMASK_PUBKEY_3);
 }
 
 main().catch((error) => {
