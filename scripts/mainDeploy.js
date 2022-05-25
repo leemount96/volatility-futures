@@ -30,7 +30,7 @@ async function main() {
   await oracle.updateSpotFromSqueeth(currentNormalization, expectedNormalization);
 
   const VPoolStartPrice = await oracle.spotEVIXLevel();
-  const feePercentage = 1*10**8;
+  const feePercentage = 5*10**7;
 
   const PerpVPool = await hre.ethers.getContractFactory("PerpVPool");
   const perpVPool = await PerpVPool.deploy(VPoolStartPrice, usdc.address, feePercentage);

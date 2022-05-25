@@ -29,7 +29,7 @@ export const NavbarComponent = () => {
             <Nav.Link as={Link} to="/lp" href="lp">
               Provide Liquidity
             </Nav.Link>
-            <NavDropdown title="FAQ" id="basic-nav-dropdown">
+            <NavDropdown title="About" id="basic-nav-dropdown">
               <NavDropdown.Item as={Link} to="/risks" href="risks">
                 Risks
               </NavDropdown.Item>
