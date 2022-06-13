@@ -15,6 +15,7 @@ import { EVIXProvider } from "./components/contexts/EVIXContext";
 import { UserProvider } from "./components/contexts/UserContext";
 import { PoolProvider } from "./components/contexts/PoolContext";
 import { createClient, WagmiConfig } from "wagmi";
+import { Footer } from "./components/Footer";
 
 const client = createClient();
 
@@ -39,6 +40,7 @@ function App() {
                   <Route path="/admin" element={<AdminComponent />} />
                 </Routes>
               </Container>
+              <Footer />
             </BrowserRouter>
           </UserProvider>
         </PoolProvider>
